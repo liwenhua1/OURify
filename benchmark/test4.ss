@@ -11,6 +11,8 @@ class Cnt {
 		int temp = this.val;
 		int temp1 = temp+1;
 		this.val = temp1; 
+		int temp4;
+		temp4 = this.val;
 		int temp2 = this.val1;
 		int temp3 = temp2 - 1;
 		this.val1 = temp3; 

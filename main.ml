@@ -15,8 +15,8 @@ exception Foo of string
 (******************************************)
 (* main function                          *)
 (******************************************)
-let class_field = ref ([]:(string * (string list)) list)
-
+let class_field = ref ([]:(string * (string list)) list) (* for field inheritance *)
+let pos_fix = ref 0 (*for variable assignment*)
 let rec find_field alist name = 
   match alist with 
   | [] -> []
@@ -590,13 +590,33 @@ let rec replace_var pure name1 name2=
     | Ipure.Or (a,b,c) -> Ipure.Or (replace_var a name1 name2,replace_var b name1 name2,c)
     | Ipure.BForm a -> Ipure.BForm a
     | _ ->  raise (Foo ( "other Pure formula "))
-
+let rec rn (pure_expression:Ipure.exp) o n = 
+  match pure_expression with 
+  | Var ((a,b),c) -> if (String.compare a o == 0) then Ipure.Var ((n,b),c) else Var ((a,b),c)
+  | Add (a,b,c) -> Add (rn a o n , rn b o n,c)
+  | Subtract (a,b,c) -> Subtract (rn a o n , rn b o n,c)
+  | res -> res
 let rec replace_var_from_heap heap oid nid = 
   match heap with 
   | Iformula.HTrue -> Iformula.HTrue
   | Iformula.Heapdynamic a -> if String.compare (fst a.h_formula_heap_node) oid == 0 then Iformula.Heapdynamic {h_formula_heap_node = nid;h_formula_heap_content =a.h_formula_heap_content;h_formula_heap_pos=a.h_formula_heap_pos} else Iformula.Heapdynamic a
   | Iformula.Star a -> Iformula.Star {h_formula_star_h1= replace_var_from_heap a.h_formula_star_h1 oid nid;h_formula_star_h2 = replace_var_from_heap a.h_formula_star_h2 oid nid;h_formula_star_pos = a.h_formula_star_pos}
   | _ -> raise (Foo "other heapF") 
+
+let rec replace_var_content_from_heap heap oid nid = 
+  let rec process content = 
+    let rec helper o = 
+      match o with 
+      | [] -> []
+      | x :: xs -> (fst x, (rn (snd x) oid nid)) :: (helper xs) in
+    match content with 
+    | x :: xs -> (fst x, helper (snd x)) :: process xs
+    | [] -> [] in
+  match heap with 
+  | Iformula.HTrue -> Iformula.HTrue
+  | Iformula.Heapdynamic a -> let res = process a.h_formula_heap_content in Iformula.Heapdynamic {h_formula_heap_node=a.h_formula_heap_node;h_formula_heap_content =res;h_formula_heap_pos=a.h_formula_heap_pos} 
+  | Iformula.Star a -> Iformula.Star {h_formula_star_h1= replace_var_content_from_heap a.h_formula_star_h1 oid nid;h_formula_star_h2 = replace_var_content_from_heap a.h_formula_star_h2 oid nid;h_formula_star_pos = a.h_formula_star_pos}
+  | _ -> raise (Foo "other heapF1") 
 
 let find_meth_dec obj_name mth_name = 
   let p = match !program with
@@ -637,6 +657,24 @@ let select_spec state node meth =
   if fst content == false then retrieve_spec (find_var node) (find_var node) [] else 
   let obj = fst (List.hd (List.rev (snd content))) in
   retrieve_spec obj meth (snd content)
+
+let rname_for_heap heap old_n new_n = 
+  let t_var = (new_n, Unprimed) in
+  let repalce_1 = replace_var_from_heap heap old_n t_var in
+  let replace_2 = replace_var_content_from_heap repalce_1 old_n new_n in
+  replace_2
+let rec rname_for_pure pure old_n new_n = 
+  match pure with 
+  | Ipure.BForm Eq (a,b,c) ->  Ipure.BForm (Eq (rn a old_n new_n, rn b old_n new_n,c))
+  | And (a,b,c) -> And (rname_for_pure a old_n new_n,rname_for_pure b old_n new_n,c)
+  | a -> a
+let rename state old_name new_name = 
+  match state with 
+  |Iformula.Base { formula_base_heap = h_f; formula_base_pure = p_f;formula_base_pos = po} -> 
+    let n_h_f = rname_for_heap h_f old_name new_name in
+    let n_p_f = rname_for_pure p_f old_name new_name in
+    let new_state = Iformula.Base { formula_base_heap = n_h_f; formula_base_pure = n_p_f;formula_base_pos = po} in new_state
+  |_-> raise (Foo ("Not supported yet1"))
 
 let rec oop_verification_method_aux obj decl expr (current:specs) : specs = 
 match current with 
@@ -765,7 +803,7 @@ match current with
   | Assign {exp_assign_op; exp_assign_lhs; exp_assign_rhs; _ } -> 
       let (lhs, rhs) = (exp_assign_lhs, exp_assign_rhs) in 
       (match (lhs, rhs) with 
-      | (VarDecl _, VarDecl _ ) -> raise (Foo "bingo!")
+      (* | (VarDecl _, VarDecl _ ) -> raise (Foo "bingo!") *)
       | (Member {exp_member_base=v1; exp_member_fields = f; _ }, a) ->
         (match v1 with
         | Var {exp_var_name = v2; _ } -> let null_write = null_test current' v2 in
@@ -822,7 +860,23 @@ match current with
         (match v2 with
         | Var {exp_var_name = v3; exp_var_pos = po } -> let null_read = null_test current' v3 in
              if null_read == true then let _ = print_string "NPE detected: null read \n" in (Err current')
-             else raise (Foo ("Todo"))
+             else let old_var = v1 ^ (string_of_int !pos_fix) in
+                  let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+                  let current' = rename current' v1 old_var in 
+                  let field = List.hd exp_member_fields in 
+                  let (r1,r2) = (retriveContentfromNode current' v3) in
+                  let value = retrive_content_from_list r2 field in
+                  let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), value, po)) in
+                  (Ok (update_pure current' form po))
+
+        | This a -> let old_var = v1 ^ (string_of_int !pos_fix) in
+                    let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+                    let current' = rename current' v1 old_var in 
+                    let field = List.hd exp_member_fields in 
+                    let (r1,r2) = (retriveContentfromNode current' "this") in
+                    let value = retrive_content_from_list r2 field in
+                    let form = Ipure.BForm (Eq (Var ((v1, Unprimed), a.exp_this_pos), value, a.exp_this_pos)) in
+                       (Ok (update_pure current' form a.exp_this_pos))
               (* let (r1,r2) = retriveContentfromPure (retrivepure current') v3 in
                  if r1 == true then let value =  
                     |_ -> raise (Foo ("Int"))
