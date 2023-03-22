@@ -618,6 +618,17 @@ let rec replace_var_content_from_heap heap oid nid =
   | Iformula.Star a -> Iformula.Star {h_formula_star_h1= replace_var_content_from_heap a.h_formula_star_h1 oid nid;h_formula_star_h2 = replace_var_content_from_heap a.h_formula_star_h2 oid nid;h_formula_star_pos = a.h_formula_star_pos}
   | _ -> raise (Foo "other heapF1") 
 
+let rec rname expres oid nid = 
+  match expres with 
+  | Iast.Var a -> if (String.compare a.exp_var_name oid) == 0 then (Ipure.Var ((nid,Unprimed), a.exp_var_pos)) else (Ipure.Var ((a.exp_var_name,Unprimed), a.exp_var_pos)) 
+  | Binary a -> (match a.exp_binary_op with 
+                | OpPlus -> Add (rname a.exp_binary_oper1 oid nid, rname a.exp_binary_oper2 oid nid , a.exp_binary_pos)
+                | OpMinus -> Subtract (rname a.exp_binary_oper1 oid nid, rname a.exp_binary_oper2 oid nid , a.exp_binary_pos)
+                | _ -> raise (Foo "only plus and minus"))
+  | IntLit a -> IConst (a.exp_int_lit_val,a.exp_int_lit_pos)
+  | _ -> raise (Foo "other binary") 
+
+
 let find_meth_dec obj_name mth_name = 
   let p = match !program with
   |None -> (raise (Foo ("Impossible")))
@@ -920,6 +931,21 @@ match current with
                  
           |_ -> raise (Foo ("Other heap formula: instanceof "))) *)
          
+      | (Var {exp_var_name = v1; _ }, Var {exp_var_name = v2;exp_var_pos = po}) ->
+        let old_var = v1 ^ (string_of_int !pos_fix) in
+        let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+        let v2_var = if (String.compare v1 v2) == 0 then old_var else v2 in
+        let current' = rename current' v1 old_var in 
+        let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), Var ((v2_var, Unprimed), po), po)) in
+            (Ok (update_pure current' form po))
+
+      | (Var {exp_var_name = v1; exp_var_pos = po }, Binary a) ->
+              let old_var = v1 ^ (string_of_int !pos_fix) in
+              let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+              let exp_new= rname (Binary a) v1 old_var in  
+              let current' = rename current' v1 old_var in 
+              let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), exp_new, po)) in
+                  (Ok (update_pure current' form po))
       
       | _ -> raise (Foo ("Assign: "^kind_of_Exp lhs ^ " " ^ kind_of_Exp rhs)) 
       
