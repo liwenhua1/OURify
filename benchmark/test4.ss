@@ -9,14 +9,12 @@ class Cnt {
 			presumes this::Cnt<val:v, val1:w>  achieves this::Cnt<val:v+1, val1:w-1> ;
 	{
 		int temp = this.val;
-		int temp1 = temp+1;
-		this.val = temp1; 
-		int temp4;
-		temp4 = this.val;
-		temp4 = temp4 + 1;
-		int temp2 = this.val1;
-		int temp3 = temp2 - 1;
-		this.val1 = temp3; 
+		temp = temp + 1;
+		this.val = temp;
+		temp = this.val1;
+		temp = temp - 1;
+		this.val1 = temp;
+		
 		
 	}
 
