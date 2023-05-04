@@ -276,6 +276,7 @@ let rec retriveContentfromPure (spec:formula) name =
       let (res1,res2) = retriveContentfromPure alising name1 in if res1 == false then (false, []) else match res2 with
                                                                                                                                 | Var a -> retriveContentfromNode (spec1:Iast.F.formula) (fst (fst a))
                                                                                                                                 | Null a -> (false, [])
+                                                                                                                                | IConst a -> (false, [])
                                                                                                                                 | _ -> raise (Foo "Must be var")
 
 
@@ -978,13 +979,24 @@ match current with
          else (Err current')
        | _ -> raise (Foo ("Assign-Member-Var: "))
     |_ *)
-    | Cond a -> let pure_condition = Ipure.BForm (transfer_formula_from_program_to_pure a.exp_cond_condition) in
+    | Cond a -> let res = (match a.exp_cond_condition with
+                | BoolLit a -> a.exp_bool_lit_val
+                | Var b -> 
+                  let r = retriveContentfromPure (retrivepure current') b.exp_var_name in 
+                  ( match r with
+                  |(true, IConst (1,_)) -> true
+                  |(true, IConst (0,_)) -> false
+                  |_ -> raise (Foo ("Var match 1 or 0")))
+
+            
+                | _ ->
+                let pure_condition = Ipure.BForm (transfer_formula_from_program_to_pure a.exp_cond_condition) in
                 let tt = !temp_var in 
                 let () = temp_var := [] in
                 let () = entail_checking "condition_checking.slk" (singlised_heap (Ok current')) (Ok (Iformula.Base {formula_base_heap=Iformula.HTrue;formula_base_pure=pure_condition;formula_base_pos=a.exp_cond_pos})) in 
                 let () = temp_var := tt in
                 let content = Asksleek.asksleek "condition_checking.slk" in
-                let res = Asksleek.entail_res content in
+                Asksleek.entail_res content ) in
                 (match res with
                 | true-> oop_verification_method_aux obj decl a.exp_cond_then_arm (Ok current')
                 | false-> oop_verification_method_aux obj decl a.exp_cond_else_arm (Ok current'))
@@ -998,6 +1010,8 @@ match current with
                    (Ok (update_pure current' form a.exp_var_pos))
                    | IntLit a -> let form = Ipure.BForm (Eq (Var (("res",Unprimed),a.exp_int_lit_pos), IConst (a.exp_int_lit_val,a.exp_int_lit_pos),a.exp_int_lit_pos)) in
                    (Ok (update_pure current' form a.exp_int_lit_pos))
+                   | Null a -> let form = Ipure.BForm (Eq (Var (("res",Unprimed),a), Null a,a)) in
+                   (Ok (update_pure current' form a))
                    | _ -> raise (Foo ("Only return var")))
                 
                 )

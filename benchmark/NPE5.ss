@@ -2,31 +2,16 @@ ublic class NullPointerExceptions {
 
 
 
-  // npe local with field
-  public int nullPointerException() {
-    A a = null;
-    return a.x;
-  }
+  
 
-  public A canReturnNullObject(boolean ok) {
-    A a = new A();
-    if (ok) return a;
-    else return null;
-  }
-
-  public static void expectNotNullObjectParameter(A a) {
-    a.method();
-  }
+ 
 
   public static void expectNotNullArrayParameter(A[] array) {
     array.clone();
   }
 
   // npe with branching, interprocedural
-  public int nullPointerExceptionInterProc() {
-    A a = canReturnNullObject(false);
-    return a.x;
-  }
+  
 
   // npe with exception handling
   public int nullPointerExceptionWithExceptionHandling(boolean ok) {

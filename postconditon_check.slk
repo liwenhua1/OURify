@@ -1,4 +1,4 @@
 data A {int x; }.
 
-checkentail this::A<v> & a = null |- (exists z: this::A<v> & (true) & (a = null)).
+checkentail this::A<v> * a::A<null> & (b = null) & (o = 1) |- (exists temp, i: emp*this::A<v> * a::A<null> & ((true) & (i = 0)) & ((b = null) & (i = 0))).
 print residue.

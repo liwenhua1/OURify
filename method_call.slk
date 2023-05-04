@@ -1,5 +1,4 @@
-data AnotherImplementationOfInterface {}.
-data ClassCastExceptions {}.
+data A {int x; }.
 
-checkentail (exists temp2: this::ClassCastExceptions<> * i::AnotherImplementationOfInterface<> & ((true) & (((this = this) & ((i = temp) & (true))) & ((true) & ((true) & (true))))) & ((true) & (true))) |- (exists temp2: this::ClassCastExceptions<> * temp::AnotherImplementationOfInterface<> & ((true) & (true)) & (((this = this) & ((i = temp) & (true))) & ((true) & ((true) & (true))))).
+checkentail (exists i: this::A<v> & ((o = 0) & (((this = this) & ((o = i) & (true))) & (((v = v) & (true)) & ((true) & (true))))) & ((true) & (i = 0))) |- (exists i: this::A<v> & ((true) & (i = 0)) & (((this = this) & ((o = i) & (true))) & (((v = v) & (true)) & ((true) & (true))))).
 print residue.
