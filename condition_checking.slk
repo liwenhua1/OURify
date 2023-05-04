@@ -1,0 +1,4 @@
+data A {int x; }.
+
+checkentail this::A<v> & true |- this != null.
+print residue.

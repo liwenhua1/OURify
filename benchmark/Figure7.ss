@@ -9,7 +9,7 @@ class Cnt {
 	dynamic presumes this::Cnt<val:v> * other::Object<>AbstractHistogram<> achieves err this::Cnt<val:v> * other::AbstractHistogram<> ;
 
 	{   int y = other instanceof AbstractHistogram;
-		if (y) {
+		if (y > 0 ) {
 			DoubleHistogram otherHistogram = (DoubleHistogram) other;
 		}
 	}

@@ -1,5 +1,4 @@
-data Sub {int val; }.
-data Test {}.
+data A {int x; }.
 
-checkentail this::Test<> * q::Sub<1> & true |- (exists y, temp2, w, w, temp: this::Test<> * emp * q::Sub<w> & ((((true) & (temp = 1)) & ((temp = w) & (w = 1))) & (temp2 = null)) & (y = 1)).
+checkentail this::A<v> & a = null |- (exists z: this::A<v> & (true) & (a = null)).
 print residue.

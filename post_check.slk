@@ -1,4 +1,5 @@
-data Sub {int val; }.
+data AbstractHistogram {}.
+data Cnt {int val; }.
 
-checkentail this::Sub<w> & (x = w) & (w = 1) |- this::Sub<w> & x = w.
+checkentail this::Cnt<v> * other::AbstractHistogram<> & true |- this::Cnt<v> * other::AbstractHistogram<> & true.
 print residue.

@@ -687,6 +687,21 @@ let rename state old_name new_name =
     let new_state = Iformula.Base { formula_base_heap = n_h_f; formula_base_pure = n_p_f;formula_base_pos = po} in new_state
   |_-> raise (Foo ("Not supported yet1"))
 
+let rec transfer_formula_from_program_to_pure (program_formula:Iast.exp) : P.b_formula= 
+  let helper z = 
+    (match z with
+    | Iast.Var a -> Ipure.Var ((a.exp_var_name,Unprimed),a.exp_var_pos)
+    | Iast.This a -> Ipure.Var (("this",Unprimed),a.exp_this_pos)
+    | Iast.IntLit a -> Ipure.IConst (a.exp_int_lit_val,a.exp_int_lit_pos)
+    | Iast.Null a -> Ipure.Null (a)
+    | _ -> raise (Foo ("binary operation transfer Not supported yet"))) in
+  match program_formula with 
+  |Iast.Binary {exp_binary_op = OpEq; exp_binary_oper1 = a;exp_binary_oper2 =  b;exp_binary_pos = c} -> Ipure.Eq (helper a,helper b,c)
+  |Iast.Binary {exp_binary_op = OpNeq; exp_binary_oper1 = a;exp_binary_oper2 = b;exp_binary_pos = c} -> Ipure.Neq (helper a,helper b,c)
+  |Iast.Binary {exp_binary_op = OpGt; exp_binary_oper1 = a;exp_binary_oper2 = b;exp_binary_pos = c} -> Ipure.Gt (helper a,helper b,c)
+  |Iast.Binary {exp_binary_op = OpLt; exp_binary_oper1 = a;exp_binary_oper2 = b;exp_binary_pos = c} -> Ipure.Lt (helper a,helper b,c)
+  | _ -> raise (Foo ("binary operation transfer Not supported yet"))
+
 let rec oop_verification_method_aux obj decl expr (current:specs) : specs = 
 match current with 
 | Err a -> Err a
@@ -696,7 +711,9 @@ match current with
 
 	(match expr with
   
+  
   | Block {exp_block_body; _ } -> oop_verification_method_aux obj decl exp_block_body current
+  
   
   | Seq {exp_seq_exp1; exp_seq_exp2; _ } -> 
     let temp = oop_verification_method_aux obj decl exp_seq_exp1 current in 
@@ -799,6 +816,10 @@ match current with
         | IntLit { exp_int_lit_val = i; exp_int_lit_pos = po  } -> let value = Ipure.IConst (i, po) in 
           let form = Ipure.BForm (Eq (Var ((id , Unprimed), loc), value , loc)) in
           Ok (update_pure current' form loc)
+
+        | Null a -> let value = Ipure.Null (a) in 
+        let form = Ipure.BForm (Eq (Var ((id , Unprimed), loc), value , loc)) in
+        Ok (update_pure current' form loc)
 
         
           
@@ -957,22 +978,27 @@ match current with
          else (Err current')
        | _ -> raise (Foo ("Assign-Member-Var: "))
     |_ *)
-    | Cond a -> (match a.exp_cond_condition with
-              | Var b -> 
-                let r = retriveContentfromPure (retrivepure current') b.exp_var_name in 
-                ( match r with
-                | (true, IConst (1,_)) -> oop_verification_method_aux obj decl a.exp_cond_then_arm (Ok current')
-                |(true, IConst (0,_)) -> oop_verification_method_aux obj decl a.exp_cond_else_arm (Ok current')
-                |_ -> raise (Foo ("Var match 1 or 0")))
-              |_ -> raise (Foo ("Condition needs to be Var"))
-    )
+    | Cond a -> let pure_condition = Ipure.BForm (transfer_formula_from_program_to_pure a.exp_cond_condition) in
+                let tt = !temp_var in 
+                let () = temp_var := [] in
+                let () = entail_checking "condition_checking.slk" (singlised_heap (Ok current')) (Ok (Iformula.Base {formula_base_heap=Iformula.HTrue;formula_base_pure=pure_condition;formula_base_pos=a.exp_cond_pos})) in 
+                let () = temp_var := tt in
+                let content = Asksleek.asksleek "condition_checking.slk" in
+                let res = Asksleek.entail_res content in
+                (match res with
+                | true-> oop_verification_method_aux obj decl a.exp_cond_then_arm (Ok current')
+                | false-> oop_verification_method_aux obj decl a.exp_cond_else_arm (Ok current'))
+              
+    
     | Return a ->
                 (match a.exp_return_val with
                    |None -> Ok current'
-                   |Some exp -> match exp with
+                   |Some exp -> (match exp with
                    | Var a -> let form = Ipure.BForm (Eq (Var (("res",Unprimed),a.exp_var_pos), Var ((a.exp_var_name,Unprimed),a.exp_var_pos),a.exp_var_pos)) in
                    (Ok (update_pure current' form a.exp_var_pos))
-                   | _ -> raise (Foo ("Only return var"))
+                   | IntLit a -> let form = Ipure.BForm (Eq (Var (("res",Unprimed),a.exp_int_lit_pos), IConst (a.exp_int_lit_val,a.exp_int_lit_pos),a.exp_int_lit_pos)) in
+                   (Ok (update_pure current' form a.exp_int_lit_pos))
+                   | _ -> raise (Foo ("Only return var")))
                 
                 )
     | CallRecv a ->
@@ -1122,8 +1148,11 @@ let rec check_static_entail dynamic static_list=
                      let entail_for_static = subsumption_check_single_method sp sq (fst dynamic) (snd dynamic) in if entail_for_static == true then (false,true) else check_static_entail dynamic xs
 
 let verified_static static_spec o d expression = 
+  
   let initalState = (fst static_spec) in 
-  let final = oop_verification_method_aux o d expression initalState in
+  let final = match expression with
+  | Block {exp_block_body=Empty _;_} -> snd static_spec
+  |_ -> oop_verification_method_aux o d expression initalState in
   let string_of_final =if (List.length !temp_var == 0) then string_of_spec final else spec_with_ex final in
   let static_post = (snd static_spec) in
   entail_checking "postconditon_check.slk" (singlised_heap static_post) (singlised_heap final);

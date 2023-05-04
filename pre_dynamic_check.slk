@@ -1,4 +1,4 @@
-data Super {int val; }.
+data CtVariable {}.
 
-checkentail this::Super<v> & x = w |- this::Super<v> & x = w.
+checkentail this::CtVariable<> & true |- this::CtVariable<> & true.
 print residue.
