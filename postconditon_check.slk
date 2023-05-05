@@ -1,4 +1,6 @@
-data A {int x; }.
+data Cnt {int val; int val1; }.
+data String {}.
+data FastCnt {int val; int val1; int bak; }.
 
-checkentail this::A<v> * a::A<null> & (b = null) & (o = 1) |- (exists temp, i: emp*this::A<v> * a::A<null> & ((true) & (i = 0)) & ((b = null) & (i = 0))).
+checkentail this::FastCnt<v, w, n> & x = null |- (exists temp: this::FastCnt<v, w, n> & (x = null) & (temp = v)).
 print residue.

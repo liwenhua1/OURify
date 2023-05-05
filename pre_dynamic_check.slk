@@ -1,4 +1,7 @@
+data CtParameter {}.
 data CtVariable {}.
+data Ctelement {}.
+data String {}.
 
 checkentail this::CtVariable<> & true |- this::CtVariable<> & true.
 print residue.

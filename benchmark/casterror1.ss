@@ -26,7 +26,7 @@ class Test {
     static
         presumes this::Test<> * a::Objec<>Str<> achieves err this::Test<> * a::Objec<>;
     static
-        presumes this::Test<> * a::Str<> achieves ok this::Test<> * a::Str<>;
+        presumes this::Test<> * a::Str<> achieves ok this::Test<> * a::Str<> & b=a;
     static
         presumes this::Test<> * a::Objec<>Integer<> achieves err this::Test<> * a::Objec<>Integer<>;
     {

@@ -1,4 +1,5 @@
 data A {int x; }.
+data String {}.
 
 checkentail this::A<v> & true |- this != null.
 print residue.

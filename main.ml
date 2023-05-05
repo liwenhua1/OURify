@@ -15,12 +15,21 @@ exception Foo of string
 (******************************************)
 (* main function                          *)
 (******************************************)
-let class_field = ref ([]:(string * (string list)) list) (* for field inheritance *)
+let class_field = ref ([]:(string * ((string * string) list)) list) (* for field inheritance *)
 let pos_fix = ref 0 (*for variable assignment*)
 let rec find_field alist name = 
+  let rec helper alist = 
+  match alist with
+    | []-> []
+    | (a,b)::xs -> b :: helper xs in 
   match alist with 
   | [] -> []
-  | x::xs -> if (String.compare (fst x) name == 0) then (snd x) else find_field xs name 
+  | x::xs -> if (String.compare (fst x) name == 0) then helper (snd x) else find_field xs name 
+
+let rec find_field_pre alist name = 
+    match alist with 
+    | [] -> []
+    | x::xs -> if (String.compare (fst x) name == 0) then  (snd x) else find_field_pre xs name 
 let program = ref (None:prog_decl option)
 let verified_method = ref ([]: (ident*ident*((Iast.specs*Iast.specs) list)*((Iast.specs*Iast.specs) list)) list)
 
@@ -156,8 +165,12 @@ let singlised_heap spec =
     | Err a -> Err (Iformula.Base {formula_base_heap=Iprinter.normalise_formula_base_heap heap;
                                  formula_base_pure = pure;
                                  formula_base_pos = po})
+let write_content_class s = 
+   let fs = find_field_pre !class_field s in 
+    List.fold_right (fun (a,b) res -> a^" "^b^";"^" "^res) fs ""
+
 let write_content s = 
-    List.fold_right (fun r1 res -> "int "^r1^";"^" "^res) s ""
+      List.fold_right (fun r1 res -> "int "^r1^";"^" "^res) s ""
 
 let rec write_field s = 
   match s with
@@ -205,8 +218,13 @@ let type_restriction spec t =
 
 
 
-let string_of_da alist= 
-  List.fold_right (fun (a,b) acc -> acc^"data "^a^" {"^ write_content b^"}."^"\n") alist ""
+  let string_of_da alist= 
+  let rec not_in s slist = match slist with
+        | [] -> true
+        | x::xs -> if (String.compare x s) == 0 then false else not_in s xs in 
+  let hplist = ref [] in 
+  let s1 = List.fold_right (fun (a,b) acc -> hplist := a :: !hplist; acc^"data "^a^" {"^ write_content_class a^"}."^"\n") (List.tl !class_field) "" in
+      List.fold_right (fun (a,b) acc -> if (not_in a !hplist) then (acc^"data "^a^" {"^ write_content b^"}."^"\n") else acc) alist s1 
 let data_message s1 s2= let r1 = retriveheap s1 in
    let r2 = retriveheap s2 in
    let res = find_data r1 r2 in
@@ -724,7 +742,7 @@ match current with
   | VarDecl {exp_var_decl_type; exp_var_decl_decls; _} -> 
     let (id, expO, loc) = List.hd exp_var_decl_decls in 
     let () = match exp_var_decl_type with
-    | Named a -> ()
+    | Named a -> () (*toso temp_var with not int type*)
     | _ ->  temp_var := id::!temp_var in
     (match expO with 
     | None -> let form = Ipure.BForm (Eq (Var ((id , Unprimed), loc), Null loc, loc)) in
@@ -1274,11 +1292,14 @@ let oop_verification_object (decl: Iast.data_decl) =
 
 let update_class_field (class_dec:data_decl) = 
   let obj = class_dec.data_name in 
-  let fields_from_parent = find_field (!class_field) class_dec.data_parent_name in 
+  let fields_from_parent = find_field_pre (!class_field) class_dec.data_parent_name in 
   let rec obj_fields alist = 
     match alist with 
     |[] -> []
-    |x::xs -> (snd (fst x)) :: obj_fields xs in 
+    |x::xs -> let z = (match fst (fst x) with
+     | Prim Int -> ("int", (snd (fst x)))
+     | Named a ->  (a, (snd (fst x)))
+     | _ -> raise (Foo ("Other prim type"))) in z :: obj_fields xs in 
   let current_field = obj_fields class_dec.data_fields in 
   let res = (obj , fields_from_parent @ current_field) in 
   class_field := !class_field @ [res]

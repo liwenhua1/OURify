@@ -1,4 +1,6 @@
-data Super {int val; }.
+data Cnt {int val; int val1; }.
+data String {}.
+data FastCnt {int val; int val1; int bak; }.
 
-checkentail this::Super<b+1> & res = b+1 |- this::Super<b+1> & res = b+1.
+checkentail this::FastCnt<v, w, n> & x = null |- this::FastCnt<v, w, n> & x = null.
 print residue.

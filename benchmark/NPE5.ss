@@ -23,12 +23,7 @@ ublic class NullPointerExceptions {
     }
   }
 
-  class B {
-    A a;
-
-    void test() {}
-  }
-
+ 
   public static int nullPointerExceptionWithArray() {
     A[] array = new A[] {null};
     A t = array[0];
@@ -36,14 +31,7 @@ ublic class NullPointerExceptions {
   }
 
   // npe with a chain of fields
-  class C {
-    B b;
-  }
-
-  public int FN_nullPointerExceptionWithAChainOfFields(C c) {
-    c.b = new B();
-    return c.b.a.x;
-  }
+ 
 
   // npe with a null object parameter
   public static void nullPointerExceptionWithNullObjectParameter() {

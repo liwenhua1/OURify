@@ -85,3 +85,40 @@
   }
   
   }
+
+  class B {
+    A a;
+
+    B()
+  static
+    presumes true achieves new_this::B<a:null> ;
+  {
+
+  }
+
+    virtual void test() {}
+  }
+
+  class C {
+    B b;
+
+
+  C()
+  static
+    presumes true achieves new_this::C<b:null> ;
+  {
+
+  }
+  
+
+  virtual int FN_nullPointerExceptionWithAChainOfFields(C c) 
+    static presumes this::C<b:v1> * c::C<b:w1> achieves err this::C<b:v1> * c::C<b:temp> * temp::B<a:null> ;
+  {
+    B temp = new B();
+    c.b = temp;
+    int temp2 = c.b;
+    int temp3 = temp2.a;
+    int temp4 = temp3.x;
+    return temp4;
+  }
+  }

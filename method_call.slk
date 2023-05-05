@@ -1,4 +1,5 @@
-data A {int x; }.
+data Super {int val; }.
+data String {}.
 
-checkentail (exists i: this::A<v> & ((o = 0) & (((this = this) & ((o = i) & (true))) & (((v = v) & (true)) & ((true) & (true))))) & ((true) & (i = 0))) |- (exists i: this::A<v> & ((true) & (i = 0)) & (((this = this) & ((o = i) & (true))) & (((v = v) & (true)) & ((true) & (true))))).
+checkentail (exists temp: this::Super<v> & ((true) & (((this = this) & (true)) & (((v = b+1) & (true)) & (true)))) & (true)) |- (exists temp: this::Super<b+1> & (true) & (((this = this) & (true)) & (((v = b+1) & (true)) & (true)))).
 print residue.
