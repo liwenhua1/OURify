@@ -1,8 +1,7 @@
-data CtParameter {}.
-data CtVariable {}.
-data Ctelement {}.
+data Sub {}.
+data Super {}.
+data Objec {}.
 data String {}.
-data CtExecutable {}.
 
-checkentail this::CtVariable<> * res::CtExecutable<> & true |- this::CtVariable<> * res::CtExecutable<> & true.
+checkentail this::Super<> * res::Objec<> & true |- this::Super<> * res::Objec<> & true.
 print residue.

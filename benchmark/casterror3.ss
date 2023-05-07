@@ -78,7 +78,7 @@ class AnotherImplementationOfInterface extends MyInterface {
 
   virtual int classCastExceptionImplementsInterfaceBad() 
   static 
-        presumes this::ClassCastExceptions<>  achieves err this::ClassCastExceptions<> * i::MyInterface<>AnotherImplementationOfInterface<>;
+        presumes this::ClassCastExceptions<>  achieves err this::ClassCastExceptions<> * temp::MyInterface<>AnotherImplementationOfInterface<>;
   
   {
     AnotherImplementationOfInterface temp = new AnotherImplementationOfInterface();

@@ -1,6 +1,7 @@
-data Cnt {int val; int val1; }.
+data Sub {}.
+data Super {}.
+data Objec {}.
 data String {}.
-data FastCnt {int val; int val1; int bak; }.
 
-checkentail this::FastCnt<v, w, n> & x = null |- (exists temp: this::FastCnt<v, w, n> & (x = null) & (temp = v)).
+checkentail this::Sub<> * b::Sub<> & true |- (exists m: emp*emp * this::Sub<> * b::Sub<> & (true) & (m = null)).
 print residue.

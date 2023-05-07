@@ -45,11 +45,6 @@ class Sub extends Super {
 		 presumes this::Sub<> * a::Super<> achieves ok this::Sub<> * a::Super<> * m::Objec<>;
 	static 
 		 presumes this::Sub<> * a::Sub<> achieves err this::Sub<> * a::Sub<> & m = null;
-    dynamic 
-		 presumes this::Sub<> * a::Super<> achieves ok this::Sub<> * a::Super<> * m::Objec<>;
-    dynamic 
-		 presumes this::Sub<> * a::Sub<> achieves err this::Sub<> * a::Sub<> & m = null;
-	
 	{
 		Objec m = a.foo();
 		m.toString();
@@ -58,8 +53,6 @@ class Sub extends Super {
 
 	virtual void buggy (Sub b)
 	static 
-	        presumes this::Sub<> * b::Sub<> achieves err this::Sub<> * b::Sub<> ;
-	dynamic 
 	        presumes this::Sub<> * b::Sub<> achieves err this::Sub<> * b::Sub<> ;
 	{
 		this.test(b);
