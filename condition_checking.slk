@@ -1,5 +1,9 @@
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
 data A {int x; }.
+data Objec {}.
 data String {}.
 
-checkentail this::A<v> & true |- this != null.
+checkentail this::D<q1> * s::Objec<> & true |- s = null.
 print residue.

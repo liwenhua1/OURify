@@ -1,7 +1,9 @@
-data Sub {}.
-data Super {}.
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
+data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Sub<> * b::Sub<> & true |- (exists m: emp*emp * this::Sub<> * b::Sub<> & (true) & (m = null)).
+checkentail this::D<q1> * t::A<null> * a::A<null> * s::A<null> & true |- (exists temp: this::D<q1> * emp * t::A<null> * a::A<null> & (((true) & (true)) & (temp = 1)) & ((s = null) & (temp = 0))).
 print residue.

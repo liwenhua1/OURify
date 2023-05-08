@@ -4,26 +4,50 @@ ERROR : fixcalc cannot be found!!
 !!! **src/tpdispatcher.ml#391:set_tp z3Starting z3... 
 
 !!! **WARNING****src/sleek.ml#494:[/usr/local/bin/prelude.slk,postconditon_check.slk]
-Entail 1: Valid. 
+Entail 1: Fail.(must) cause:AndR[
+ true |-  0=1. LOCS:[0;8] (RHS: contradiction),
+ t!=this & a!=t & a!=this & this!=null & t!=null & a!=null & s!=a & s!=t & 
+ s!=this & s!=null |-  s=null. LOCS:[0;8] (must-bug)
+]
 
 Residue:
 
- <1>emp&{FLOW,(4,5)=__norm#E}[]
-[[ SEARCH ==>  Match(this,this) ==>  SEARCH ==>  Match(b,b)]]
 
+Starting Omega.../usr/local/bin/oc
+ MustErr Context: 
+    fe_kind: MUST
+    fe_name: logical bug
+    fe_locs: {
+        fc_message:  true |-  0=1. LOCS:[0;8] (RHS: contradiction)
+        fc_current_lhs_flow: {FLOW,(4,5)=__norm#E}
+      }
+    [[ SEARCH ==>  Match(this,this) ==>  SEARCH ==>  Match(t,t) ==>  SEARCH ==>  Match(a,a)]]
+   FAIL_AND 
+    fe_kind: MUST
+    fe_name: logical bug
+    fe_locs: {
+        fc_message:  t!=this & a!=t & a!=this & this!=null & t!=null & a!=null & s!=a & s!=t & 
+ s!=this & s!=null |-  s=null. LOCS:[0;8] (must-bug)
+        fc_current_lhs_flow: {FLOW,(4,5)=__norm#E}
+      }
+    [[ SEARCH ==>  Match(this,this) ==>  SEARCH ==>  Match(t,t) ==>  SEARCH ==>  Match(a,a)]]
+   
+ CEX:false
 
-
-Stop z3... 5 invocations 
-SAT Count   : 1
-SAT % Hit   : 0.%
-IMPLY Count : 5
-IMPLY % Hit : 20.%
-Time(cache overhead) : 0.000355 (seconds)
+Stop z3... 28 invocations 
+Stop Omega... 2 invocations 
+SAT Count   : 14
+SAT % Hit   : 35.71%
+IMPLY Count : 26
+IMPLY % Hit : 26.92%
+Time(cache overhead) : 0.004609 (seconds)
 
 0 false contexts at: ()
 
-!!! log(small):(0.00378,9)
-Total verification time: 0.035926 second(s)
-	Time spent in main process: 0.028368 second(s)
-	Time spent in child processes: 0.007558 second(s)
+!!! log(small):(0.058124,45)
+!!! 
+ log(bigger)(>4s)(1):(5.,[(simplify:41<3:Z3,5.)])
+Total verification time: 0.075172 second(s)
+	Time spent in main process: 0.056159 second(s)
+	Time spent in child processes: 0.019013 second(s)
 

@@ -1,7 +1,6 @@
-data Sub {}.
-data Super {}.
+data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Super<> * res::Objec<> & true |- this::Super<> * res::Objec<> & true.
+checkentail this::Objec<> & true |- this::Objec<> & true.
 print residue.

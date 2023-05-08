@@ -1,10 +1,28 @@
-  class A {
+  class Objec {
+    
+	virtual void toString()
+	static	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	dynamic	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	{}
+
+} 
+  
+  class A extends Objec{
     int x;
 
   A()
   static presumes true achieves new_this::A<x:null> ;
   {
 
+  }
+    virtual void nullPointerExceptionFromNotKnowingThatThisIsNotNull() 
+    static presumes this=null achieves err this=null ;
+    static presumes this::A<x:v> achieves ok this::A<x:4> ;
+    {
+    if (this == null) {} else {}
+    this.x = 4;
   }
 
     virtual int thisNotNullOk() 
@@ -22,6 +40,13 @@
       
       return 0;}
     }
+
+    inherit void toString()
+	static	
+	      presumes this::A<x:v> achieves  this::A<x:v>;
+	dynamic	
+	      presumes this::Objec<>A<x:v> achieves  this::Objec<>A<x:v>;
+	{}
 
     virtual int thisNotNullBad() 
     static 
@@ -44,6 +69,8 @@
         static 
             presumes this::A<x:q> achieves ok this::A<x:q> ;
     {}
+
+    
     
     virtual int nullPointerException() 
     static 
@@ -109,6 +136,12 @@
   {
 
   }
+
+   virtual void method(A a) 
+        static 
+            presumes this::C<b:q1> * a::A<x:w1> achieves ok this::C<b:q1> * a::A<x:w1> ;
+            presumes this::C<b:q1> & a=null achieves err this::C<b:q1> & a=null ;
+    {a.method();}
   
 
   virtual int FN_nullPointerExceptionWithAChainOfFields(C c) 
@@ -121,4 +154,66 @@
     int temp4 = temp3.x;
     return temp4;
   }
+
+    virtual void nullPointerExceptionWithNullObjectParameter() 
+    static 
+            presumes this::C<b:q1>  achieves err this::C<b:q1> & temp = null ;
+    {
+      A temp = null;
+    this.method(temp);
+  }
+
+    virtual Objec id_generics(Objec o) 
+    static presumes this::C<b:q1> * o::Objec<>A<x:v> achieves ok this::C<b:q1> * res::Objec<>A<x:v> ;
+    {
+    o.toString();
+    return o;
+   }
+
+    virtual A frame(A s) 
+    static presumes this::C<b:q1> * s::A<x:v> achieves ok this::C<b:q1> * res::A<x:v> ;
+    {
+      A temp = this.id_generics(s);
+    return temp;
+  }
+
+    virtual void nullPointerExceptionUnlessFrameFails() 
+    static presumes this::C<b:q1> achieves err this::C<b:q1> * temp::A<x:null> & a=temp & s = null ;
+    {
+    A s = null;
+    A temp = new A();
+    Objec a = this.frame(temp);
+    int y = a instanceof A;
+    if (y == 1) {
+      s.method();
+    } else {}
+  }
+  }
+
+  class D {
+    int x;
+  
+  virtual int preconditionCheckStateTest(D d) 
+  static presumes this::D<x:q1> * d::D<x:q2> achieves ok this::D<x:q1> * d::D<x:q2> & res=q2;
+  { 
+    int temp = d.x;
+    return temp;
+  }
+
+  virtual void genericMethodSomewhereCheckingForNull(Objec s) 
+  static presumes this::D<x:q1> * s::Objec<> achieves ok this::D<x:q1> * s::Objec<>;
+  {
+    if (s == null) {} else {}
+  }
+
+  virtual void noNullPointerExceptionAfterSkipFunction() 
+  static presumes this::D<x:q1> achieves ok this::D<x:q1> * t::A<x:null> * a::A<x:null> *s::A<x:null>;
+  {
+    Objec t = new A();
+    int temp = 1;
+    Objec s = t.canReturnNullObject(temp);
+    this.genericMethodSomewhereCheckingForNull(s);
+    s.toString();
+  }
+
   }

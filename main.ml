@@ -881,9 +881,9 @@ match current with
              
              |_ -> raise (Foo ("Exp not support 1")))
         | This _ -> 
-          (* let null_write = null_test current' "this" in
+          let null_write = null_test current' "this" in 
           if null_write == true then let _ = print_string "NPE detected" in (Err current') 
-          else *)
+          else 
               (match a with 
                |Var {exp_var_name = v2; exp_var_pos = po } -> let (r1,r2) = retriveContentfromPure (retrivepure current') v2 in
                  if r1 == true then let res = update_heap current' "this" (List.hd f) r2 in
