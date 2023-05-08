@@ -5,5 +5,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail (exists temp: this::A<v> & ((o = 0) & (((this = t) & ((o = temp) & (true))) & (((v = null) & (true)) & ((true) & (true))))) & (((true) & (true)) & (temp = 1))) |- (exists temp: emp*t::A<null> & (((true) & (true)) & (temp = 1)) & (((this = t) & ((o = temp) & (true))) & (((v = null) & (true)) & ((true) & (true))))).
+checkentail (exists a, temp: this::A<v> & ((true) & (((this = s1) & (true)) & (((v = null) & (true)) & (true)))) & (((((true) & (true)) & (temp = 1)) & ((s1 = a) & (temp = 1))) & (true))) |- (exists a, temp: emp*emp * emp*emp * emp*s1::A<null> & (((((true) & (true)) & (temp = 1)) & ((s1 = a) & (temp = 1))) & (true)) & (((this = s1) & (true)) & (((v = null) & (true)) & (true)))).
 print residue.

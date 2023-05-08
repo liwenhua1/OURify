@@ -186,6 +186,7 @@ let rec get_data heap =
   |Iformula.Heapdynamic a -> [(take_data a.h_formula_heap_content)]
   |Iformula.Star a -> (get_data a.h_formula_star_h1) @ (get_data a.h_formula_star_h2)
   |Iformula.HTrue -> []
+  |Iformula.HFalse -> []
   |_ ->  raise (Foo "Other F1 ")
 let rec notinside e alist = 
   match alist with
@@ -1043,16 +1044,22 @@ match current with
       let spec_selection1 = select_spec current' a.exp_call_recv_receiver a.exp_call_recv_method in
        let rec helper sp_li = (match sp_li with 
                               | [] -> raise (Foo "cannot find a spec")
-                              | spec_selection :: ss -> let uni_pre_heap = unification_heap current' (remove_ok_err (fst spec_selection)) uni_pre_pure in
+                              | spec_selection :: ss -> (*print_string (Iprinter.string_of_spec (fst spec_selection));*)let uni_pre_heap = unification_heap current' (remove_ok_err (fst spec_selection)) uni_pre_pure in
       let uni = Ipure.And (uni_pre_pure ,uni_pre_heap,a.exp_call_recv_pos) in
       let form = Ipure.And (retrivepure current' ,uni,a.exp_call_recv_pos) in
       let pre_pure = Ipure.And ( (Ipure.And (retrivepure (remove_ok_err (fst spec_selection)) ,uni,a.exp_call_recv_pos)), retrivepure current', a.exp_call_recv_pos) in
       let pre_condition = Ok (Iformula.Base {formula_base_heap = retriveheap (remove_ok_err (fst spec_selection));formula_base_pure = pre_pure;formula_base_pos = a.exp_call_recv_pos}) in
       let current_state = Iformula.Base {formula_base_heap = snd res;formula_base_pure = form;formula_base_pos = a.exp_call_recv_pos} in
+      (* let t = !temp_var; in temp_var := []; *)
+      entail_checking_method_call "method_call.slk" (singlised_heap pre_condition) (Ok (Iformula.mkFalse a.exp_call_recv_pos)); 
+      let content_slk = Asksleek.asksleek "method_call.slk" in
+      let res1 = Asksleek.entail_res content_slk in
+        if res1 == true then (*let () =temp_var := t in*) (helper ss) else ( 
       entail_checking_method_call "method_call.slk" (singlised_heap pre_condition) (singlised_heap (Ok current_state)); 
       let content_slk = Asksleek.asksleek "method_call.slk" in
       let res1 = Asksleek.entail_res content_slk in
-      if res1 == true then let post_condition = refine (remove_ok_err (snd spec_selection)) uni in
+      (* temp_var := t; *)
+      (if res1 == true then let post_condition = refine (remove_ok_err (snd spec_selection)) uni in
       let post_state = Iformula.Base {formula_base_heap = Iformula.Star {h_formula_star_h1 = fst res;h_formula_star_h2 =retriveheap post_condition;h_formula_star_pos = retrivepo current'}; 
                                     formula_base_pure = Ipure.And (retrivepure current',retrivepure post_condition,retrivepo current');formula_base_pos = retrivepo current'} in
                                     (* print_string (string_of_formula post_state); *)
@@ -1060,7 +1067,7 @@ match current with
         |Ok a -> Ok post_state
         |Err a -> Err post_state)
       (* let post_state = refine post_condition uni_pre_heap unification_pure in  *)
-      else helper ss) in 
+      else helper ss))) in 
       helper spec_selection1
   | Empty _ -> current
   | _ -> print_string (kind_of_Exp expr ^ " "); current 

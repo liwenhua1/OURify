@@ -5,5 +5,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::D<q1> * s::Objec<> & true |- s = null.
+checkentail this::D<q1> * s::A<v> & true |- s = null.
 print residue.

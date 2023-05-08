@@ -170,10 +170,10 @@
     return o;
    }
 
-    virtual A frame(A s) 
-    static presumes this::C<b:q1> * s::A<x:v> achieves ok this::C<b:q1> * res::A<x:v> ;
+    virtual A frame(A g) 
+    static presumes this::C<b:q1> * g::A<x:v> achieves ok this::C<b:q1> * res::A<x:v> ;
     {
-      A temp = this.id_generics(s);
+      A temp = this.id_generics(g);
     return temp;
   }
 
@@ -201,19 +201,19 @@
   }
 
   virtual void genericMethodSomewhereCheckingForNull(Objec s) 
-  static presumes this::D<x:q1> * s::Objec<> achieves ok this::D<x:q1> * s::Objec<>;
+  static presumes this::D<x:q1> * s::Objec<>A<x:v> achieves ok this::D<x:q1> * s::Objec<>A<x:v>;
   {
     if (s == null) {} else {}
   }
 
   virtual void noNullPointerExceptionAfterSkipFunction() 
-  static presumes this::D<x:q1> achieves ok this::D<x:q1> * t::A<x:null> * a::A<x:null> *s::A<x:null>;
+  static presumes this::D<x:q1> achieves ok this::D<x:q1> * t::A<x:null> * a::A<x:null> *s1::A<x:null> & s1 = a;
   {
     Objec t = new A();
     int temp = 1;
-    Objec s = t.canReturnNullObject(temp);
-    this.genericMethodSomewhereCheckingForNull(s);
-    s.toString();
+    Objec s1 = t.canReturnNullObject(temp);
+    this.genericMethodSomewhereCheckingForNull(s1);
+    s1.toString();
   }
 
   }
