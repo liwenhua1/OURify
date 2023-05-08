@@ -292,11 +292,12 @@ let rec retriveContentfromPure (spec:formula) name =
     let heap = retriveheap spec1 in
      let (r1,r2) = rfN_helper heap name1 in
      if r1==true then (true, r2) else 
-      let (res1,res2) = retriveContentfromPure alising name1 in if res1 == false then (false, []) else match res2 with
-                                                                                                                                | Var a -> retriveContentfromNode (spec1:Iast.F.formula) (fst (fst a))
-                                                                                                                                | Null a -> (false, [])
-                                                                                                                                | IConst a -> (false, [])
-                                                                                                                                | _ -> raise (Foo "Must be var")
+      let (res1,res2) = retriveContentfromPure alising name1 in 
+      if res1 == false then (false, []) else match res2 with
+                                                            | Var a -> retriveContentfromNode (spec1:Iast.F.formula) (fst (fst a))
+                                                            | Null a -> (false, [])
+                                                            | IConst a -> (false, [])
+                                                            | _ -> raise (Foo "Must be var")
 
 
     ;;
@@ -460,11 +461,24 @@ let rec null_test spec var_name =
 let all_arg m_call = 
   let start = [find_var m_call.exp_call_recv_receiver] in
   List.fold_right (fun a acc -> let res = find_var a in [res] @ acc ) m_call.exp_call_recv_arguments start            
-let find_residue spec1 method_call = 
+let find_residue spec method_call = 
+    let spec1 = retriveheap spec in 
     let arg_list = all_arg method_call in
     let rec not_in s slist = match slist with
                             | [] -> true
                             | x::xs -> if String.compare x s == 0 then false else not_in s xs in
+    (* let rec find_alising var_name sp=
+  
+      (match sp with
+      | Ipure.BForm a -> (match a with
+                          | Eq (Var a,Var b,c) -> if (((String.compare var_name (fst (fst a))) == 0) && not (not_in (fst (fst b)) arg_list))
+                                                  then true else 
+                                                  if (((String.compare var_name (fst (fst b))) == 0) && not (not_in (fst (fst a)) arg_list))
+                                                  then true else false 
+                          | _ -> false 
+                            )
+      | Ipure.And (a,b,c) -> (find_alising var_name a) || (find_alising var_name b)
+      | _ -> raise (Foo "other pure F")) in *)
     let rec helper heap = 
       match heap with
       |Iformula.Heapdynamic a -> if not_in (fst (a.h_formula_heap_node)) arg_list then (Iformula.Heapdynamic a, Iformula.HTrue) else (Iformula.HTrue, Iformula.Heapdynamic a)
@@ -579,6 +593,7 @@ let rec search_replace (var: ident * P.exp) formu =
     | Ipure.BForm BConst (true,a) -> Ipure.BForm (BConst (true,a))
     | Ipure.And (a,b,c) ->Ipure.And (check_replace_pure a fo,check_replace_pure b fo,c)
     | Ipure.BForm (Eq (a,b,c)) -> Ipure.BForm (Eq (h3 a fo,h3 b fo,c))
+    | Ipure.BForm (Neq (a,b,c)) -> Ipure.BForm (Neq (h3 a fo,h3 b fo,c))
     |_ -> raise (Foo "other pureF3") in 
   let finished_pure = check_replace_pure (retrivepure state) formula in
   Iformula.Base {formula_base_heap =finished_heap; formula_base_pure = finished_pure; formula_base_pos = retrivepo state}
@@ -772,18 +787,50 @@ match current with
         else raise (Foo ("VarDecl-expRHS-Member: " ^ kind_of_Exp expRHS)) *)
 
       | Binary {exp_binary_op; exp_binary_oper1; exp_binary_oper2} -> 
+        let helper varname = 
+          let res = retriveContentfromPure (retrivepure current') varname in
+          (match res with
+          | (true, Null _) -> true
+          | _ -> false
+          ) in
         (match exp_binary_op, exp_binary_oper1, exp_binary_oper2 with 
-          | (OpPlus, Var a, Var b) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), Var ((b.exp_var_name,Unprimed),loc),loc),loc)) in
+          | (OpPlus, Var a, Var b) -> 
+            let res = helper a.exp_var_name in
+            let res2 = helper b.exp_var_name in
+            if (res || res2) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), Var ((b.exp_var_name,Unprimed),loc),loc),loc)) in
           (Ok (update_pure current' form loc))
-          | (OpPlus, Var a, IntLit b) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
+          | (OpPlus, Var a, IntLit b) -> 
+            let res = helper a.exp_var_name in
+            if (res) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
           (Ok (update_pure current' form loc))
-          | (OpPlus, IntLit b, Var a) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
+          | (OpPlus, IntLit b, Var a) -> 
+            let res = helper a.exp_var_name in
+            if (res) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Add (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
           (Ok (update_pure current' form loc))
-          | (OpMinus, Var a, Var b) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), Var ((b.exp_var_name,Unprimed),loc),loc),loc)) in
+          | (OpMinus, Var a, Var b) -> 
+            let res = helper a.exp_var_name in
+            let res2 = helper b.exp_var_name in
+            if (res || res2) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), Var ((b.exp_var_name,Unprimed),loc),loc),loc)) in
           (Ok (update_pure current' form loc))
-          | (OpMinus, Var a, IntLit b) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
+          | (OpMinus, Var a, IntLit b) -> 
+            let res = helper a.exp_var_name in
+            if (res) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
           (Ok (update_pure current' form loc))
-          | (OpMinus, IntLit b, Var a) -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
+          | (OpMinus, IntLit b, Var a) -> 
+            let res = helper a.exp_var_name in
+            if (res) then (print_string "NPE detected: null method call \n" ; (Err current'))
+            else
+            let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc),Subtract (Var ((a.exp_var_name,Unprimed),loc), IConst (b.exp_int_lit_val,loc),loc),loc)) in
           (Ok (update_pure current' form loc))
 
 
@@ -1037,7 +1084,7 @@ match current with
     | CallRecv a ->
       let null_res = null_test current' (find_var a.exp_call_recv_receiver) in 
       if null_res == true then (print_string "NPE detected: null method call \n" ; (Err current')) else
-      let h = retriveheap current' in let res = find_residue h a in 
+      let res = find_residue current' a in 
       let obj_list = (retriveContentfromNode current' (find_var a.exp_call_recv_receiver)) in
       let obj_name =(if (List.length (snd obj_list) ==0) then (find_var a.exp_call_recv_receiver) else fst (List.hd (snd obj_list))) in let meth_dec = find_meth_dec obj_name a.exp_call_recv_method in
       let uni_pre_pure = unification_pure a meth_dec in 

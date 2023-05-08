@@ -13,23 +13,10 @@
     if (s == null) {}
   }
 
-  public void noNullPointerExceptionAfterSkipFunction() {
-    String t = new String("Hello!");
-    String s = t.toString();
-    genericMethodSomewhereCheckingForNull(s);
-    s.length();
-  }
 
-  String hashmapNPE(HashMap h, Object o) {
-    return (h.get(o).toString());
-  }
 
-  String NPEhashmapProtectedByContainsKey(HashMap h, Object o) {
-    if (h.containsKey(o)) {
-      return (h.get(o).toString());
-    }
-    return "aa";
-  }
+
+ 
 
   int NPEvalueOfFromHashmapBad(HashMap<Integer, Integer> h, int position) {
     return h.get(position);
@@ -66,6 +53,8 @@
     }
   }
 
+
+
   Object[] arr = new Object[1];
 
   Object arrayReadShouldNotCauseSymexMemoryError(int i) {
@@ -90,33 +79,7 @@
     t.f();
   }
 
-  private @Nullable Object mFld;
-
-  void FN_nullableFieldNPE() {
-    mFld.toString();
-  }
-
-  void guardedNullableFieldDeref() {
-    if (mFld != null) mFld.toString();
-  }
-
-  void allocNullableFieldDeref() {
-    mFld = new Object();
-    mFld.toString();
-  }
-
-  void nullableParamNPE(@Nullable Object param) {
-    param.toString();
-  }
-
-  void guardedNullableParamDeref(@Nullable Object param) {
-    if (param != null) param.toString();
-  }
-
-  void allocNullableParamDeref(@Nullable Object param) {
-    param = new Object();
-    param.toString();
-  }
+  
 
   native boolean test1();
 

@@ -1,3 +1,4 @@
+data Nullable {Objec mFld; }.
 data D {int x; }.
 data C {B b; }.
 data B {A a; }.
@@ -5,5 +6,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::D<q1> * s::A<v> & true |- s = null.
+checkentail this::Nullable<v> * v::Objec<> & (true) & (temp = v) |- temp != null.
 print residue.

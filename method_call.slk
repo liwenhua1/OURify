@@ -1,3 +1,4 @@
+data Nullable {Objec mFld; }.
 data D {int x; }.
 data C {B b; }.
 data B {A a; }.
@@ -5,5 +6,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail (exists a, temp: this::A<v> & ((true) & (((this = s1) & (true)) & (((v = null) & (true)) & (true)))) & (((((true) & (true)) & (temp = 1)) & ((s1 = a) & (temp = 1))) & (true))) |- (exists a, temp: emp*emp * emp*emp * emp*s1::A<null> & (((((true) & (true)) & (temp = 1)) & ((s1 = a) & (temp = 1))) & (true)) & (((this = s1) & (true)) & (((v = null) & (true)) & (true)))).
+checkentail this::Objec<> & ((true) & (((this = temp) & (true)) & ((true) & (true)))) & ((true) & (temp = v)) |- emp*emp & ((true) & (temp = v)) & (((this = temp) & (true)) & ((true) & (true))).
 print residue.

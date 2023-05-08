@@ -6,7 +6,10 @@
 	dynamic	
 	      presumes this::Objec<> achieves  this::Objec<>;
 	{}
-
+   Objec ()
+	static
+		presumes true achieves  new_this::Objec<>;
+	{}
 } 
   
   class A extends Objec{
@@ -17,6 +20,18 @@
   {
 
   }
+
+
+  virtual int match(int d)
+  static presumes this::A<x:q2> & d = q2 achieves ok this::A<x:q2> & d = q2 & res = d;
+  static presumes this::A<x:q2> & d != q2 achieves ok this::A<x:q2> & d != q2 & res = null;
+  {
+    int temp = this.x;
+    if (temp == d) {return d;} else {return null;}
+  }
+
+
+
     virtual void nullPointerExceptionFromNotKnowingThatThisIsNotNull() 
     static presumes this=null achieves err this=null ;
     static presumes this::A<x:v> achieves ok this::A<x:4> ;
@@ -124,6 +139,13 @@
   }
 
     virtual void test() {}
+
+    virtual A get()
+    static presumes this::B<a:r> * r::A<x:y> achieves ok this::B<a:r> * r::A<x:y> & res = r;
+    {
+      int temp = this.a;
+      return temp;
+    }
   }
 
   class C {
@@ -216,4 +238,83 @@
     s1.toString();
   }
 
+  virtual int hfoo(A h) 
+  static presumes this::D<x:q1> * h::B<a:i> * i::A<x:p> achieves ok this::D<x:q1> * h::B<a:i> * i::A<x:p> * temp::A<x:p> & res = i & i = temp;
+  {
+    int temp = h.get();
+    temp.toString();
+    return temp;
+  }
+
+  virtual int hashNPE(A h, int k) 
+  static presumes this::D<x:q1> * h::A<x:i> & k = i achieves ok this::D<x:q1> * h::A<x:i> & k = i & res = k + 1;
+  static presumes this::D<x:q1> * h::A<x:i> & k != i achieves err this::D<x:q1> * h::A<x:i> & k != i;
+  {
+    int temp = h.match(k);
+    int temp2 = temp + 1;
+    return temp2;
+  }
+
+   virtual int NPEhashmapProtectedByContainsKey(A h, int k) 
+   static presumes this::D<x:q1> * h::A<x:i> & k = i achieves ok this::D<x:q1> * h::A<x:i> & k = i & res = k + 1;
+   static presumes this::D<x:q1> * h::A<x:i> & k != i achieves ok this::D<x:q1> * h::A<x:i> & k != i & res = 0;
+   {
+    int temp = h.x;
+    if (temp != k) {
+      return 0;
+    } else {
+    int temp2 = this.hashNPE(h, k);
+    return temp2;
+  }
+  }
+
+  }
+  
+  class Nullable {
+  Objec mFld;
+
+  virtual void FN_nullableFieldNPE() 
+  static presumes this::Nullable<mFld:null> achieves err this::Nullable<mFld:null> & temp = null;
+  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:v> * v::Objec<> * temp::Objec<> & temp = v;
+  {
+    Objec temp = this.mFld;
+    temp.toString();
+  }
+
+  virtual void guardedNullableFieldDeref() 
+  static presumes this::Nullable<mFld:null> achieves ok this::Nullable<mFld:null> & temp = null;
+  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:v> * v::Objec<> * temp::Objec<> & temp = v;
+
+  {
+    Objec temp = this.mFld;
+    if (temp != null) {temp.toString();} else {};
+  }
+
+  virtual void allocNullableFieldDeref() 
+  static presumes this::Nullable<mFld:v> achieves ok this::Nullable<mFld:temp> * temp::Objec<> * temp2::Objec<> & temp2 = temp;
+  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:temp> * temp::Objec<> * temp2::Objec<> * v::Objec<>& temp2 = temp;
+
+  {
+    Objec temp = new Objec();
+    this.mFld = temp;
+    Objec temp2 = this.mFld;
+    temp2.toString();
+  }
+
+  virtual void nullableParamNPE() 
+  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:v> * v::Objec<>& temp = v ;
+ 
+  {
+    Objec temp = this.mFld;
+    temp.toString();
+  }
+
+  virtual void guardedNullableParamDeref( Object param) {
+    if (param != null) param.toString();
+  }
+
+  virtual void allocNullableParamDeref( Object param) {
+    param = new Object();
+    param.toString();
+  }
   }

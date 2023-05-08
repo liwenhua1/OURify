@@ -16,7 +16,7 @@
  class Test{
 
    virtual DeviceSession getDeviceSession(Channel channel) 
-        static presumes this::Test<> & channel = null achieves this::Test<> & channel = null;
+        static presumes this::Test<> & channel = null achieves err this::Test<> & channel = null;
     {
         ChannelPipeline x = channel.getPipeline();
     }
