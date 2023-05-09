@@ -86,58 +86,20 @@
   native boolean test2();
 
 
-  void derefBoxedGetterAfterCheckShouldNotCauseNPE() {
-    boolean b = getBool() != null && getBool();
-  }
 
-  static void derefNonThisGetterAfterCheckShouldNotCauseNPE() {
-    NullPointerExceptions c = new NullPointerExceptions();
-    if (c.getObj() != null) {
-      c.getObj().toString();
-    }
-  }
+
 
   // latent because we don't know if test1() can return "true"
   // arguably should be reported?
  
-  void nullPointerExceptionArrayLength() {
-    Object[] arr = null;
-    int i = arr.length;
-  }
 
-  class $$Class$Name$With$Dollars {
-    void npeWithDollars() {
-      String s = null;
-      int n = s.length();
-    }
-  }
 
-  void nullableNonNullStringAfterTextUtilsIsEmptyCheckShouldNotCauseNPE(@Nullable String str) {
-    if (!TextUtils.isEmpty(str)) {
-      str.length();
-    }
-  }
 
-  void someNPEAfterResourceLeak() {
-    T t = CloseableAsResourceExample.sourceOfNullWithResourceLeak();
-    t.f();
-  }
 
   private Object mOkObj = new Object();
 
-  public void nullableParamReassign1(@Nullable Object o) {
-    if (o == null) {
-      o = mOkObj;
-    }
-    o.toString();
-  }
 
-  public void nullableParamReassign2(@Nullable Object o, Object okObj) {
-    if (o == null) {
-      o = okObj;
-    }
-    o.toString();
-  }
+  
 
   private @Nullable Object mNullableField;
 

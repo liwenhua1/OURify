@@ -7,5 +7,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail emp*this::Bl<v1, 1> & (true) & (b1 = 1) |- b != null.
+checkentail emp*this::Bl<1, 1> & (true) & (b1 = 1) |- b1 != null.
 print residue.

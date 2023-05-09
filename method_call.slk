@@ -7,5 +7,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail (exists b1: this::Bl<v1, 1> & ((true) & (((this = this) & (true)) & (((v1 = v1) & ((1 = 1) & (true))) & (true)))) & (true)) |- (exists b1: this::Bl<v1, 1> & (true) & (((this = this) & (true)) & (((v1 = v1) & ((1 = 1) & (true))) & (true)))).
+checkentail (exists b1: this::Objec<> & ((true) & (((this = temp) & (true)) & ((true) & (true)))) & (((true) & (b1 = 1)) & (true))) |- (exists b1: emp*emp * emp*temp::Objec<> & (((true) & (b1 = 1)) & (true)) & (((this = temp) & (true)) & ((true) & (true)))).
 print residue.

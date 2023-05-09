@@ -322,11 +322,30 @@
   }
 
   virtual void allocNullableParamDeref(Objec param) 
-  static presumes this::Nullable<mFld:v> * param::Objec<> achieves ok this::Nullable<mFld:v> * param::Objec<> * unreachable::Objec<>;
+  static presumes this::Nullable<mFld:v> * param::Objec<> achieves ok this::Nullable<mFld:v> * param::Objec<> ;
   {
     param = new Objec();
     param.toString();
   }
+
+  virtual void nullableParamReassign1(Object o) 
+  static presumes this::Nullable<mFld:v> & o = null achieves ok this::Nullable<mFld:v> * o::Objec<>;
+  {
+    if (o == null) {
+      o = new Objec();
+    }
+    o.toString();
+  }
+
+  virtual void nullableParamReassign2(Object o, Objec okObj) 
+  static presumes this::Nullable<mFld:v> * okObj::Objec<> & o = null achieves ok this::Nullable<mFld:v> * okObj::Objec<> & o = okObj;
+  {
+    if (o == null) {
+      o = okObj;
+    }
+    o.toString();
+  }
+
   }
 
 class Bl {
@@ -360,7 +379,7 @@ class Bl {
 
   virtual void derefGetterAfterCheckShouldNotCauseNPE() 
   static presumes this::Bl<test1:1,test2:v1>  achieves ok this::Bl<test1:1,test2:v1> * temp::Objec<>;
-  static presumes this::Bl<test1:0,test2:v1>  achieves ok this::Bl<test1:0,test2:v1> ;
+  static presumes this::Bl<test1:0,test2:v1>  achieves ok this::Bl<test1:0,test2:v1> & temp = null;
   {
     Objec temp = this.getObj();
     if (temp != null ) {
@@ -373,17 +392,23 @@ class Bl {
   static presumes this::Bl<test1:v1,test2:1>  achieves ok this::Bl<test1:v1,test2:1> ;
   {
     int b1 = this.getBool();
-     if (b != null) {
+     if (b1 != null) {
     int b2 = this.getBool();
     b2 = b2 + b1;
     b2 = b2 - 1;
     } else {int b2 = 0;}
   }
   
-   virtual void badCheckShouldCauseNPE_latent() {
-    if (getBool() != null) {
-      getObj().toString();
+   virtual void badCheckShouldCauseNPE_latent() 
+   static presumes this::Bl<test1:v1,test2:1>  achieves err this::Bl<test1:0,test2:1> & temp = null; 
+   static presumes this::Bl<test1:1,test2:1>  achieves ok this::Bl<test1:1,test2:1> * temp::Objec<> ; 
+   {
+    int b1 = this.getBool();
+    if (b1 != null) {
+      Objec temp = this.getObj();
+      temp.toString();
     }
   }
 
 }
+

@@ -7,5 +7,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Bl<v1, 1> & true |- (exists b2, b1: emp*this::Bl<v1, 1> & ((true) & (b1 = 1)) & (b2 = 0)).
+checkentail this::Bl<1, 1> * temp::Objec<> & true |- (exists b1: emp*emp * this::Bl<1, 1> * emp * temp::Objec<> & (((true) & (b1 = 1)) & (true)) & (true)).
 print residue.

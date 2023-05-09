@@ -627,7 +627,11 @@ let entail_checking_method_call name sp1 sp2 = match sp1 with
 
 let rec replace_var pure name1 name2=
    match pure with
+   | Ipure.BForm (Eq (Var ((v1,pr),p1), Var ((v2,pr2),p2), p3))  -> if (String.compare v1 name1 == 0) then 
+                                                                    (if (String.compare v2 name1 == 0) then Ipure.BForm (Eq (Var ((name2,pr),p1),Var ((name2,pr2),p2), p3)) else Ipure.BForm (Eq ((Var ((name2,pr),p1), Var ((v2,pr2),p2),  p2))))
+                                                                    else  (if (String.compare v2 name1 == 0) then Ipure.BForm (Eq (Var ((v1,pr),p1),Var ((name2,pr2),p2), p3)) else Ipure.BForm (Eq ((Var ((v1,pr),p1), Var ((v2,pr2),p2),  p2))))
     | Ipure.BForm (Eq (Var ((v1,pr),p1), b, p2))  -> if (String.compare v1 name1 == 0) then Ipure.BForm (Eq (Var ((name2,pr),p1), b, p2))  else Ipure.BForm (Eq (Var ((v1,pr),p1), b, p2))
+    | Ipure.BForm (Eq (b, Var ((v1,pr),p1), p2))  -> if (String.compare v1 name1 == 0) then Ipure.BForm (Eq (b, Var ((name2,pr),p1), p2))  else Ipure.BForm (Eq (b, Var ((v1,pr),p1),  p2))
     | Ipure.And (a,b,c) -> Ipure.And (replace_var a name1 name2,replace_var b name1 name2,c)
     | Ipure.Or (a,b,c) -> Ipure.Or (replace_var a name1 name2,replace_var b name1 name2,c)
     | Ipure.BForm a -> Ipure.BForm a
@@ -1042,12 +1046,15 @@ match current with
               let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), exp_new, po)) in
                   (Ok (update_pure current' form po))
       | (Var {exp_var_name = v1; exp_var_pos = po }, New a) -> let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
-      let pu1 = replace_var_from_heap (retriveheap (remove_ok_err res)) v1 ("unreachable",Unprimed) in 
+      
+      let old_var = v1 ^ (string_of_int !pos_fix) in
+                  let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+                  let current' = rename (remove_ok_err res) v1 old_var in 
       let pu = 
-        replace_var_from_heap pu1 "new_this" (v1,Unprimed) in 
+        replace_var_from_heap (retriveheap current') "new_this" (v1,Unprimed) in 
       (match res with 
       Err b -> Err b 
-     | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure b; formula_base_pos = retrivepo b}))
+     | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure current'; formula_base_pos = retrivepo b}))
 
 
       | _ -> raise (Foo ("Assign: "^kind_of_Exp lhs ^ " " ^ kind_of_Exp rhs)) 
@@ -1255,14 +1262,35 @@ let rec check_static_entail dynamic static_list=
                       
                        else if (not (String.compare t3 t1 == 0)) then (false,true) else 
                      let entail_for_static = subsumption_check_single_method sp sq (fst dynamic) (snd dynamic) in if entail_for_static == true then (false,true) else check_static_entail dynamic xs
-
+let rec chang_heap_to_emp vname hp = 
+                      match hp with 
+                      | Iformula.HTrue -> Iformula.HTrue
+                      | Iformula.Heapdynamic a -> if String.compare (fst a.h_formula_heap_node) vname == 0 then Iformula.HTrue else Iformula.Heapdynamic a
+                      | Iformula.Star a -> Iformula.Star {h_formula_star_h1= chang_heap_to_emp vname a.h_formula_star_h1;h_formula_star_h2 = chang_heap_to_emp vname a.h_formula_star_h2;h_formula_star_pos = a.h_formula_star_pos}
+                      | _ -> raise (Foo "other heapF") 
 let verified_static static_spec o d expression = 
-  
   let initalState = (fst static_spec) in 
-  let final = match expression with
+  let final1 = match expression with
   | Block {exp_block_body=Empty _;_} -> snd static_spec
   |_ -> oop_verification_method_aux o d expression initalState in
-  let string_of_final =if (List.length !temp_var == 0) then string_of_spec final else spec_with_ex final in
+
+  let rec change alist hhp = 
+    match alist with
+    | [] -> hhp
+    | x::xs -> change xs (chang_heap_to_emp x hhp) in
+
+    let final_hp = change !temp_var (retriveheap (remove_ok_err final1)) in 
+    let final =
+    match final1 with
+    | Ok a -> Ok (Iformula.Base {formula_base_heap = final_hp;formula_base_pure = retrivepure a;formula_base_pos = retrivepo a})
+    | Err a -> Err (Iformula.Base {formula_base_heap = final_hp;formula_base_pure = retrivepure a;formula_base_pos = retrivepo a}) in 
+  
+  let string_of_final =if (List.length !temp_var != 0) then 
+
+    
+    (* print_endline (Iprinter.string_of_spec ff);   *)
+    spec_with_ex final
+    else string_of_spec final in
   let static_post = (snd static_spec) in
   entail_checking "postconditon_check.slk" (singlised_heap static_post) (singlised_heap final);
   let content = Asksleek.asksleek "postconditon_check.slk" in
