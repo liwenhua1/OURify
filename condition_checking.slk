@@ -1,3 +1,4 @@
+data Bl {int test1; int test2; }.
 data Nullable {Objec mFld; }.
 data D {int x; }.
 data C {B b; }.
@@ -6,5 +7,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Nullable<v> & param = null |- param != null.
+checkentail emp*this::Bl<v1, 1> & (true) & (b1 = 1) |- b != null.
 print residue.

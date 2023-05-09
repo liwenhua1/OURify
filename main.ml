@@ -541,11 +541,14 @@ let rec search_replace (var: ident * P.exp) formu =
          | Ipure.Add (x,y,z) -> let (r1,r2) = helper x exp2 in if r1 == true then (true, Ipure.Add (r2,y,z)) else let (r3,r4) = helper y exp2 in if r3 == true then (true, Ipure.Add (x,r4,z)) else (false, exp1)
          | Ipure.Subtract (x,y,z) -> let (r1,r2) = helper x exp2 in if r1 == true then (true, Ipure.Subtract (r2,y,z)) else let (r3,r4) = helper y exp2 in if r3 == true then (true, Ipure.Subtract (x,r4,z)) else (false, exp1)
          | _ -> raise (Foo "other pure")) in
+ (* print_string ((string_of_pure_formula formu)^"\n");  *)
   match formu with 
   | Ipure.BForm (BConst (true,a)) -> (false, var)
   | Ipure.And (a,b,c) -> let (r1,r2) = (search_replace var a) in if r1 == true then (true, r2) else (search_replace var b)
   | Ipure.BForm Eq (Var a,b,c) -> let content = snd var in let (r1,r2) = helper content (a,b) in if r1 == true then (true, (fst var, r2)) else (false, var)
   | Ipure.BForm Eq (Null a, Null b,c) -> (false, var)
+  | Ipure.BForm Eq (IConst a, IConst b,c) -> (false, var)
+  | Ipure.BForm Eq (a, Var b,c) -> let content = snd var in let (r1,r2) = helper content (b,a) in if r1 == true then (true, (fst var, r2)) else (false, var)
   |_ -> raise (Foo "other pureF1")
  let refine state formula =  
   let h1 (node: (ident * P.exp) list) form = 
@@ -559,6 +562,7 @@ let rec search_replace (var: ident * P.exp) formu =
         | Ipure.And (a,b,c) -> let (r1,r2) = (helper name a) in if r1 == true then (true, r2) else (helper name b)
         | Ipure.BForm Eq (Var a,Var b,c) -> if String.compare (fst (fst a)) name == 0 then (true, (fst (fst b))) else (false, name) 
         | Ipure.BForm Eq (Var a,_,c) -> (false, name) 
+        | Ipure.BForm Eq (IConst a, IConst b,c) -> (false, name) 
         |_ -> raise (Foo "other pureF2") in
   let check_head name1 p1 = 
     let (r1,r2) = helper name1 p1 in if r1 == true then r2 else name1 in
@@ -574,7 +578,9 @@ let rec search_replace (var: ident * P.exp) formu =
     | Ipure.BForm (BConst (true,a)) -> (false, Ipure.BForm (BConst (true,a)))
     | Ipure.And (a,b,c) -> let (r1,r2) = (check_head_1 v a) in if r1 == true then (true, r2) else (check_head_1 v b)
     | Ipure.BForm Eq (Var a, b,c) -> if String.compare (fst (fst a)) v == 0 then (true, Ipure.BForm (Eq (Var a, b,c))) else (false, Ipure.BForm (Eq (Var a, b,c))) 
-    |_ -> raise (Foo "other pureF2") in
+    | Ipure.BForm Eq (b, Var a,c) -> if String.compare (fst (fst a)) v == 0 then (true, Ipure.BForm (Eq (Var a, b,c))) else (false, Ipure.BForm (Eq (Var a, b,c))) 
+    | Ipure.BForm Eq (IConst a,IConst b,c) -> (false, Ipure.BForm (Eq (IConst a, IConst b,c))) 
+    |_ -> raise (Foo "other pureF21") in
   let rec check_replace_pure pu fo =
     let rec h3 exp f = 
    
@@ -1087,6 +1093,14 @@ match current with
                    (Ok (update_pure current' form a.exp_int_lit_pos))
                    | Null a -> let form = Ipure.BForm (Eq (Var (("res",Unprimed),a), Null a,a)) in
                    (Ok (update_pure current' form a))
+                   | New a -> let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
+                   let pu = replace_var_from_heap (retriveheap (remove_ok_err res)) "new_this" ("res",Unprimed) in 
+                   (match res with 
+                   Err b -> Err b 
+                          | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure b; formula_base_pos = retrivepo b}))
+                   | BoolLit a -> let form = if a.exp_bool_lit_val == true then Ipure.BForm (Eq (Var (("res",Unprimed),a.exp_bool_lit_pos), IConst (1 , a.exp_bool_lit_pos), a.exp_bool_lit_pos)) 
+                                            else Ipure.BForm (Eq (Var (("res",Unprimed),a.exp_bool_lit_pos), IConst (0 , a.exp_bool_lit_pos), a.exp_bool_lit_pos))  in 
+                                            (Ok (update_pure current' form a.exp_bool_lit_pos))
                    | _ -> raise (Foo ("Only return var")))
                 
                 )

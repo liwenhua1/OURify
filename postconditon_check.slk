@@ -1,3 +1,4 @@
+data Bl {int test1; int test2; }.
 data Nullable {Objec mFld; }.
 data D {int x; }.
 data C {B b; }.
@@ -6,5 +7,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Nullable<v> * param::Objec<> * unreachable::Objec<> & true |- this::Nullable<v> * unreachable::Objec<> * emp * param::Objec<> & ((true) & (true)) & (true).
+checkentail this::Bl<v1, 1> & true |- (exists b2, b1: emp*this::Bl<v1, 1> & ((true) & (b1 = 1)) & (b2 = 0)).
 print residue.

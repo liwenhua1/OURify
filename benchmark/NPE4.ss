@@ -328,3 +328,62 @@
     param.toString();
   }
   }
+
+class Bl {
+  int test1;
+
+  int test2;
+
+  virtual Objec getObj() 
+  static presumes this::Bl<test1:1,test2:v>  achieves ok this::Bl<test1:1,test2:v> * res::Objec<>;
+  static presumes this::Bl<test1:0,test2:v>  achieves ok this::Bl<test1:0,test2:v> & res=null;
+  {
+    int temp = this.test1;
+    if (temp) {
+      return new Objec();
+    } else {
+      return null;
+    }
+  }
+
+  virtual Boolean getBool() 
+  static presumes this::Bl<test1:v1,test2:1>  achieves ok this::Bl<test1:v1,test2:1> & res=1;
+  static presumes this::Bl<test1:v1,test2:0>  achieves ok this::Bl<test1:v1,test2:0> & res=null;
+  {
+    int temp = this.test2;
+    if (temp) {
+      return true;
+    } else {
+      return null;
+    }
+  }
+
+  virtual void derefGetterAfterCheckShouldNotCauseNPE() 
+  static presumes this::Bl<test1:1,test2:v1>  achieves ok this::Bl<test1:1,test2:v1> * temp::Objec<>;
+  static presumes this::Bl<test1:0,test2:v1>  achieves ok this::Bl<test1:0,test2:v1> ;
+  {
+    Objec temp = this.getObj();
+    if (temp != null ) {
+      temp.toString();
+    }
+  }
+
+  virtual void derefBoxedGetterAfterCheckShouldNotCauseNPE() 
+  static presumes this::Bl<test1:v1,test2:0>  achieves ok this::Bl<test1:v1,test2:0> ; 
+  static presumes this::Bl<test1:v1,test2:1>  achieves ok this::Bl<test1:v1,test2:1> ;
+  {
+    int b1 = this.getBool();
+     if (b != null) {
+    int b2 = this.getBool();
+    b2 = b2 + b1;
+    b2 = b2 - 1;
+    } else {int b2 = 0;}
+  }
+  
+   virtual void badCheckShouldCauseNPE_latent() {
+    if (getBool() != null) {
+      getObj().toString();
+    }
+  }
+
+}

@@ -85,27 +85,6 @@
 
   native boolean test2();
 
-  Object getObj() {
-    if (test1()) {
-      return new Object();
-    } else {
-      return null;
-    }
-  }
-
-  Boolean getBool() {
-    if (test2()) {
-      return new Boolean(true);
-    } else {
-      return null;
-    }
-  }
-
-  void derefGetterAfterCheckShouldNotCauseNPE() {
-    if (getObj() != null) {
-      getObj().toString();
-    }
-  }
 
   void derefBoxedGetterAfterCheckShouldNotCauseNPE() {
     boolean b = getBool() != null && getBool();
@@ -120,12 +99,7 @@
 
   // latent because we don't know if test1() can return "true"
   // arguably should be reported?
-  void badCheckShouldCauseNPE_latent() {
-    if (getBool() != null) {
-      getObj().toString();
-    }
-  }
-
+ 
   void nullPointerExceptionArrayLength() {
     Object[] arr = null;
     int i = arr.length;
