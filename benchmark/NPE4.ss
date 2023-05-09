@@ -21,6 +21,13 @@
 
   }
 
+  virtual int get()
+  static presumes this::A<x:n> achieves this::A<x:n> & res = n;
+  {
+    int temp = this.x;
+    return temp;
+  }
+
 
   virtual int match(int d)
   static presumes this::A<x:q2> & d = q2 achieves ok this::A<x:q2> & d = q2 & res = d;
@@ -138,10 +145,8 @@
 
   }
 
-    virtual void test() {}
-
     virtual A get()
-    static presumes this::B<a:r> * r::A<x:y> achieves ok this::B<a:r> * r::A<x:y> & res = r;
+    static presumes this::B<a:r>  achieves ok this::B<a:r> & res = r;
     {
       int temp = this.a;
       return temp;
@@ -238,8 +243,8 @@
     s1.toString();
   }
 
-  virtual int hfoo(A h) 
-  static presumes this::D<x:q1> * h::B<a:i> * i::A<x:p> achieves ok this::D<x:q1> * h::B<a:i> * i::A<x:p> * temp::A<x:p> & res = i & i = temp;
+  virtual int hfoo(B h) 
+  static presumes this::D<x:q1> * h::B<a:i> * i::A<x:p> achieves ok this::D<x:q1> * h::B<a:i> * i::A<x:p>  & res = i & i = temp;
   {
     int temp = h.get();
     temp.toString();
@@ -302,19 +307,24 @@
   }
 
   virtual void nullableParamNPE() 
-  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:v> * v::Objec<>& temp = v ;
- 
+  static presumes this::Nullable<mFld:v> * v::Objec<> achieves ok this::Nullable<mFld:v> * v::Objec<> & temp = v ;
   {
     Objec temp = this.mFld;
     temp.toString();
   }
 
-  virtual void guardedNullableParamDeref( Object param) {
-    if (param != null) param.toString();
+  virtual void guardedNullableParamDeref( Objec param) 
+  static presumes this::Nullable<mFld:v> * param::Objec<> achieves ok this::Nullable<mFld:v> * param::Objec<> ;
+   static presumes this::Nullable<mFld:v> & param = null achieves ok this::Nullable<mFld:v> & param = null  ;
+
+  {
+    if (param != null) {param.toString();}
   }
 
-  virtual void allocNullableParamDeref( Object param) {
-    param = new Object();
+  virtual void allocNullableParamDeref(Objec param) 
+  static presumes this::Nullable<mFld:v> * param::Objec<> achieves ok this::Nullable<mFld:v> * param::Objec<> * unreachable::Objec<>;
+  {
+    param = new Objec();
     param.toString();
   }
   }

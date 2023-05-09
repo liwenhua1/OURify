@@ -467,21 +467,22 @@ let find_residue spec method_call =
     let rec not_in s slist = match slist with
                             | [] -> true
                             | x::xs -> if String.compare x s == 0 then false else not_in s xs in
-    (* let rec find_alising var_name sp=
+    let rec find_alising var_name sp=
   
       (match sp with
       | Ipure.BForm a -> (match a with
                           | Eq (Var a,Var b,c) -> if (((String.compare var_name (fst (fst a))) == 0) && not (not_in (fst (fst b)) arg_list))
-                                                  then true else 
+                                                  then (true, (fst (fst b))) else 
                                                   if (((String.compare var_name (fst (fst b))) == 0) && not (not_in (fst (fst a)) arg_list))
-                                                  then true else false 
-                          | _ -> false 
+                                                  then (true, (fst (fst a))) else (false, "") 
+                          | _ -> (false, "")  
                             )
-      | Ipure.And (a,b,c) -> (find_alising var_name a) || (find_alising var_name b)
-      | _ -> raise (Foo "other pure F")) in *)
+      | Ipure.And (a,b,c) -> let res = (find_alising var_name a) in if (fst res) == true then res else (find_alising var_name b)
+      | _ -> raise (Foo "other pure F")) in
     let rec helper heap = 
       match heap with
-      |Iformula.Heapdynamic a -> if not_in (fst (a.h_formula_heap_node)) arg_list then (Iformula.Heapdynamic a, Iformula.HTrue) else (Iformula.HTrue, Iformula.Heapdynamic a)
+      |Iformula.Heapdynamic a -> if not_in (fst (a.h_formula_heap_node)) arg_list then (let r = find_alising (fst (a.h_formula_heap_node)) (retrivepure spec) in if fst r == false then
+        (Iformula.Heapdynamic a, Iformula.HTrue) else (Iformula.HTrue, Iformula.Heapdynamic {h_formula_heap_node = (snd r,Unprimed);h_formula_heap_content = a.h_formula_heap_content;h_formula_heap_pos=a.h_formula_heap_pos})) else (Iformula.HTrue, Iformula.Heapdynamic a)
       |Star a -> (Iformula.Star {h_formula_star_h1= fst (helper a.h_formula_star_h1);h_formula_star_h2=(fst (helper a.h_formula_star_h2));h_formula_star_pos=a.h_formula_star_pos},
       Iformula.Star {h_formula_star_h1= snd (helper a.h_formula_star_h1);h_formula_star_h2 = snd (helper a.h_formula_star_h2);h_formula_star_pos=a.h_formula_star_pos})
       |HTrue -> (HTrue,HTrue)
@@ -930,7 +931,7 @@ match current with
              |_ -> raise (Foo ("Exp not support 1")))
         | This _ -> 
           let null_write = null_test current' "this" in 
-          if null_write == true then let _ = print_string "NPE detected" in (Err current') 
+          if null_write == true then let _ = print_string "NPE detected \n" in (Err current') 
           else 
               (match a with 
                |Var {exp_var_name = v2; exp_var_pos = po } -> let (r1,r2) = retriveContentfromPure (retrivepure current') v2 in
@@ -1034,7 +1035,15 @@ match current with
               let current' = rename current' v1 old_var in 
               let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), exp_new, po)) in
                   (Ok (update_pure current' form po))
-      
+      | (Var {exp_var_name = v1; exp_var_pos = po }, New a) -> let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
+      let pu1 = replace_var_from_heap (retriveheap (remove_ok_err res)) v1 ("unreachable",Unprimed) in 
+      let pu = 
+        replace_var_from_heap pu1 "new_this" (v1,Unprimed) in 
+      (match res with 
+      Err b -> Err b 
+     | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure b; formula_base_pos = retrivepo b}))
+
+
       | _ -> raise (Foo ("Assign: "^kind_of_Exp lhs ^ " " ^ kind_of_Exp rhs)) 
       
       )
@@ -1084,7 +1093,7 @@ match current with
     | CallRecv a ->
       let null_res = null_test current' (find_var a.exp_call_recv_receiver) in 
       if null_res == true then (print_string "NPE detected: null method call \n" ; (Err current')) else
-      let res = find_residue current' a in 
+      let res = find_residue current' a in (*(print_endline (Iprinter.string_of_h_formula (fst res)));(print_string (Iprinter.string_of_h_formula (snd res)))*)
       let obj_list = (retriveContentfromNode current' (find_var a.exp_call_recv_receiver)) in
       let obj_name =(if (List.length (snd obj_list) ==0) then (find_var a.exp_call_recv_receiver) else fst (List.hd (snd obj_list))) in let meth_dec = find_meth_dec obj_name a.exp_call_recv_method in
       let uni_pre_pure = unification_pure a meth_dec in 

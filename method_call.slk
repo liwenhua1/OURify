@@ -6,5 +6,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Objec<> & ((true) & (((this = temp) & (true)) & ((true) & (true)))) & ((true) & (temp = v)) |- emp*emp & ((true) & (temp = v)) & (((this = temp) & (true)) & ((true) & (true))).
+checkentail this::Objec<> & ((true) & (((this = param) & (true)) & ((true) & (true)))) & ((true) & (true)) |- emp*emp * param::Objec<> & ((true) & (true)) & (((this = param) & (true)) & ((true) & (true))).
 print residue.

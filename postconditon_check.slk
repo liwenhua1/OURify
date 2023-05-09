@@ -6,5 +6,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Nullable<v> * v::Objec<> & temp = v |- this::Nullable<v> * v::Objec<> * temp::Objec<> & ((true) & (temp = v)) & (true).
+checkentail this::Nullable<v> * param::Objec<> * unreachable::Objec<> & true |- this::Nullable<v> * unreachable::Objec<> * emp * param::Objec<> & ((true) & (true)) & (true).
 print residue.
