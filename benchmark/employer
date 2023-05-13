@@ -1,0 +1,34 @@
+class Person {
+    int salary;
+    Person boss;
+    Person employee;  
+    
+
+    inv: 
+    this.salary -> v * this.boss -> null * this.employee -> null ;
+    (this.boss -> p)@B(p.employee -> this) * (this.salary -> v) @ L * (p.salary -> w) @ L & v < w ;
+    (this.employee -> e)@B(e.boss -> this) * (this.salary -> n) @ L * (e.salary -> m) @ L & m < n ; 
+
+    int get_salary()
+
+    req: this.salary -> v ens: this.salary -> v & res = v 
+    req_inv: inv ens_inv: inv 
+
+    {
+        return salary;
+    }
+
+    Person get_boss()
+        similar
+    {
+        return boss;
+    }
+
+      Person get_employee()
+        similar
+    {
+        return employee;
+    }
+         
+
+}
