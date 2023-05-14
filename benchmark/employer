@@ -31,4 +31,8 @@ class Person {
     }
          
 
+    void set_salary (int x)
+        req (this.salary -> v) 
+
+
 }
