@@ -328,7 +328,7 @@
     param.toString();
   }
 
-  virtual void nullableParamReassign1(Object o) 
+  virtual void nullableParamReassign1(Objec o) 
   static presumes this::Nullable<mFld:v> & o = null achieves ok this::Nullable<mFld:v> * o::Objec<>;
   {
     if (o == null) {
@@ -337,13 +337,126 @@
     o.toString();
   }
 
-  virtual void nullableParamReassign2(Object o, Objec okObj) 
+  virtual void nullableParamReassign2(Objec o, Objec okObj) 
   static presumes this::Nullable<mFld:v> * okObj::Objec<> & o = null achieves ok this::Nullable<mFld:v> * okObj::Objec<> & o = okObj;
   {
     if (o == null) {
       o = okObj;
     }
     o.toString();
+  }
+
+   virtual void nullableFieldReassign3(Objec o, Objec param) 
+   static presumes this::Nullable<mFld:v> * o::Objec<> * param::Objec<> achieves ok this::Nullable<mFld:v> * o::Objec<> & o = param ;
+   {
+    o = param;
+    o.toString();
+  }
+
+    virtual Objec nullableGetter(Objec o) 
+    static presumes this::Nullable<mFld:v> * o::Objec<> achieves ok this::Nullable<mFld:v> * o::Objec<> & res = o;
+    static presumes this::Nullable<mFld:v> & o = null achieves ok this::Nullable<mFld:v> & o = null & res = o;
+    {
+    return o;
+  }
+
+   virtual void FN_derefNullableGetter(Objec p) 
+    static presumes this::Nullable<mFld:v> * p::Objec<> achieves ok this::Nullable<mFld:v> * p::Objec<> & q = p;
+    static presumes this::Nullable<mFld:v> & p = null achieves err this::Nullable<mFld:v> & p = null & q = p;
+   {
+    Objec q = this.nullableGetter(p);
+    q.toString();
+  }
+
+    virtual Objec nullableRet(boolean b) 
+      static presumes this::Nullable<mFld:v> & b = 1 achieves ok this::Nullable<mFld:v> & b = 1 & res = null;
+      static presumes this::Nullable<mFld:v> & b = 0 achieves ok this::Nullable<mFld:v> * res::Objec<> & b = 0 ;
+    {
+    if (b) {
+      return null;
+    } else {
+    return new Objec();}
+  }
+
+  virtual void derefNullableRet(boolean z) 
+    static presumes this::Nullable<mFld:v> & z = 0 achieves ok this::Nullable<mFld:v> * ret::Objec<> & z = 0;
+    static presumes this::Nullable<mFld:v> & z = 1 achieves err this::Nullable<mFld:v> & ret = null & z = 1;
+  {
+    Object ret = this.nullableRet(z);
+    ret.toString();
+  }
+
+  virtual void derefNullableRetOK(boolean z) 
+    static presumes this::Nullable<mFld:v> & z = 0 achieves ok this::Nullable<mFld:v> * ret::Objec<> & z = 0;
+    static presumes this::Nullable<mFld:v> & z = 1 achieves ok this::Nullable<mFld:v> & ret = null & z = 1;
+  {
+    Object ret = this.nullableRet(z);
+    if (ret != null) {
+      ret.toString();
+    }
+  }
+
+  virtual void derefUndefNullableRet(Objec undefNullableRet) 
+  static presumes this::Nullable<mFld:v> * undefNullableRet::Objec<>  achieves ok this::Nullable<mFld:v> * undefNullableRet::Objec<> & ret = undefNullableRet;
+  static presumes this::Nullable<mFld:v> & undefNullableRet = null achieves err this::Nullable<mFld:v> & undefNullableRet = null & ret = undefNullableRet;
+  {
+    Object ret = undefNullableRet;
+    ret.toString();
+  }
+
+  virtual void derefUndefNullableRetOK(Objec undefNullableRet) 
+  static presumes this::Nullable<mFld:v> * undefNullableRet::Objec<>  achieves ok this::Nullable<mFld:v> * undefNullableRet::Objec<> & ret = undefNullableRet;
+  static presumes this::Nullable<mFld:v> & undefNullableRet = null achieves ok this::Nullable<mFld:v> & undefNullableRet = null & ret = undefNullableRet;
+  {
+    Object ret = undefNullableRet;
+    if (ret != null) {
+      ret.toString();
+    }
+  }
+
+  virtual void assumeUndefNullableIdempotentOk(Objec undefNullableRet) 
+  static presumes this::Nullable<mFld:v> * undefNullableRet::Objec<>  achieves ok this::Nullable<mFld:v> * undefNullableRet::Objec<>;
+  static presumes this::Nullable<mFld:v> & undefNullableRet = null achieves ok this::Nullable<mFld:v> & undefNullableRet = null;
+  {
+    if (undefNullableRet != null) {
+      undefNullableRet.toString();
+    }
+  }
+
+  virtual Object undefNullableWrapper(Objec undefNullableRet) 
+  static presumes this::Nullable<mFld:v> * undefNullableRet::Objec<>  achieves ok this::Nullable<mFld:v> * undefNullableRet::Objec<> & res = undefNullableRet;
+  static presumes this::Nullable<mFld:v> & undefNullableRet = null achieves ok this::Nullable<mFld:v> & undefNullableRet = null & res = undefNullableRet;
+  {
+    return undefNullableRet;
+  }
+
+  virtual void derefUndefNullableRetWrapper(Objec undef) 
+  static presumes this::Nullable<mFld:v> * undef::Objec<>  achieves ok this::Nullable<mFld:v> * undef::Objec<> & q = undef;
+  static presumes this::Nullable<mFld:v> & undef = null achieves err this::Nullable<mFld:v> & undef = null & q = undef;
+  {
+    Objec q = this.undefNullableWrapper(undef);
+    q.toString();
+  }
+
+  virtual int returnsThreeOnlyIfRetNotNull(Objec obj) 
+  static presumes this::Nullable<mFld:v> * obj::Objec<>  achieves ok this::Nullable<mFld:v> * obj::Objec<> & res = 3;
+  static presumes this::Nullable<mFld:v> & obj = null achieves ok this::Nullable<mFld:v> & obj = null & res = 2;
+  {
+    if (obj == null) {
+      return 2;
+    } else {
+    return 3;}
+  }
+
+  virtual void testNullablePrecision(Objec undefNullableRet) 
+  static presumes this::Nullable<mFld:v> * undefNullableRet::Objec<>  achieves ok this::Nullable<mFld:v> * undefNullableRet::Objec<> & ret = undefNullableRet;
+  static presumes this::Nullable<mFld:v> & undefNullableRet = null achieves ok this::Nullable<mFld:v> & undefNullableRet = null & ret = undefNullableRet;
+  {
+    Object ret = undefNullableRet;
+    int temp = this.returnsThreeOnlyIfRetNotNull(ret);
+    if ( temp == 3) {
+      ret.toString(); 
+    }
   }
 
   }

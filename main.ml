@@ -1045,7 +1045,9 @@ match current with
               let current' = rename current' v1 old_var in 
               let form = Ipure.BForm (Eq (Var ((v1, Unprimed), po), exp_new, po)) in
                   (Ok (update_pure current' form po))
-      | (Var {exp_var_name = v1; exp_var_pos = po }, New a) -> let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
+      | (Var {exp_var_name = v1; exp_var_pos = po }, New a) -> 
+        
+        let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
       
       let old_var = v1 ^ (string_of_int !pos_fix) in
                   let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
