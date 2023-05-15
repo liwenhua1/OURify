@@ -5,8 +5,8 @@ class Person {
     
 
     inv: 
-    this.salary -> v * this.boss -> null * this.employee -> null ;
-    (this.boss -> p)@B(p.employee -> this) * (this.salary -> v) @ L * (p.salary -> w) @ L & v < w ;
+    this.salary = null & this.boss = null ;
+    this.boss -> p * (p.employee -> this) @ L * (this.salary -> v) @ L * (p.salary -> w) @ L & v < w ;
     (this.employee -> e)@B(e.boss -> this) * (this.salary -> n) @ L * (e.salary -> m) @ L & m < n ; 
 
     int get_salary()
