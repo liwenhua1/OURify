@@ -9,5 +9,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail emp*emp * emp * emp * emp*emp * emp*a::A<(0+1)+1> * emp*a1::A<0+1> * this::E<l> * a2::A<0+1> & ((((((((((true) & (true)) & (true)) & (true)) & (true)) & (true)) & (true)) & (true)) & (temp = (0+1)+1)) & (temp1 = 0+1)) & (temp2 = 0+1) |- temp != 2.
+checkentail emp*emp * emp*emp * this::E<l> * a::A<(0+1)+1> & (((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1) |- temp != 2.
 print residue.

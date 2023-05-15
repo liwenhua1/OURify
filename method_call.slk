@@ -9,5 +9,5 @@ data A {int x; }.
 data Objec {}.
 data String {}.
 
-checkentail this::E<l> * z::A<v> & ((true) & (((this = this) & ((z = a2) & (true))) & (((l = l) & (true)) & (((v = 0) & (true)) & (true))))) & (((((((true) & (true)) & (true)) & (true)) & (true)) & (true)) & (true)) |- emp*emp * emp * a2::A<0> * emp*emp * emp*emp * this::E<l> * emp & (((((((true) & (true)) & (true)) & (true)) & (true)) & (true)) & (true)) & (((this = this) & ((z = a2) & (true))) & (((l = l) & (true)) & (((v = 0) & (true)) & (true)))).
+checkentail this::E<l> * z::A<v> & ((true) & (((this = this) & ((z = a) & (true))) & (((l = l) & (true)) & (((v = 0+1) & (true)) & (true))))) & (((true) & (true)) & (true)) |- emp*emp * this::E<l> * a::A<0+1> & (((true) & (true)) & (true)) & (((this = this) & ((z = a) & (true))) & (((l = l) & (true)) & (((v = 0+1) & (true)) & (true)))).
 print residue.

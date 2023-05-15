@@ -574,6 +574,20 @@ class Bl {
     a.x = 0;
   }
 
+  virtual void call_incr_deref_with_alias_Ok() 
+  static presumes this::E<nl:l>  achieves ok this::E<nl:l> * a::A<x:0> ; 
+  {
+    A a = new A();
+    a.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    int temp = a.x;
+    if (temp != 2) {
+      a = null;
+    }
+    a.x = 0;
+  }
+
    virtual void call_incr_deref2_Ok() 
    static presumes this::E<nl:l>  achieves ok this::E<nl:l> * a::A<x:2> * a1::A<x:0> * a2::A<x:1> ; 
    {
@@ -603,5 +617,95 @@ class Bl {
     a1.x = 0;
   }
 
+   virtual void call_incr_deref2_bad() 
+   static presumes this::E<nl:l>  achieves err this::E<nl:l> * a::A<x:2> * a2::A<x:1> & a1 = null ; 
+   {
+    A a = new A();
+    A a1 = new A();
+    A a2 = new A();
+    a.x = 0;
+    a1.x = 0;
+    a2.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    this.incr_deref(a1);
+    this.incr_deref(a2);
+    int temp = a.x;
+    int temp1 = a1.x;
+    int temp2 = a2.x;
+    if (temp1 == 1) 
+      {if (temp2 == 1) 
+        {if (temp == 2) 
+          {a1 = null;}}}
 
+    a1.x = 0;
+  }
+
+  virtual void incr_deref3(A aa, A ab, A ac) 
+  static presumes this::E<nl:l> * aa::A<x:v> * ab::A<x:w> * ac::A<x:m>  achieves ok this::E<nl:l> * aa::A<x:v+1> * ab::A<x:w> * ac::A<x:m> ; 
+  static presumes this::E<nl:l> * aa::A<x:null> * ab::A<x:w> * ac::A<x:m>  achieves err this::E<nl:l> * aa::A<x:null> * ab::A<x:w> * ac::A<x:m> ;
+  static presumes this::E<nl:l> *  ab::A<x:w> * ac::A<x:m> & aa = null achieves err this::E<nl:l> *  ab::A<x:w> * ac::A<x:m> & aa = null ; 
+
+  {
+    int temp = aa.x;
+    temp = temp + 1;
+    aa.x = temp;
+  }
+
+  virtual void call_incr_deref3_bad() 
+  static presumes this::E<nl:l> achieves err this::E<nl:l> * a1::A<x:null> * a2::A<x:null> * a3::A<x:null> ;
+  {
+    A a1 = new A();
+    A a2 = new A();
+    A a3 = new A();
+    this.incr_deref3(a1, a2, a3);
+  }
+
+   virtual void test_capture_alias_bad() 
+   static presumes this::E<nl:l>  achieves err this::E<nl:l> * a::A<x:2> & b = null ; 
+   {
+    A a = new A();
+    a.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    A b = a;
+    int temp = a.x;
+    if (temp == 2) {
+      b = null;
+    }
+    b.x = 0;
+  }
+
+  virtual void test_capture_alias_bad2() 
+   static presumes this::E<nl:l>  achieves err this::E<nl:l> * a1::A<x:2> * a2::A<x:null> * a3::A<x:null> & b = null ; 
+   {
+    A a1 = new A();
+    A a2 = new A();
+    A a3 = new A();
+    a1.x = 0;
+    this.incr_deref(a1);
+    this.incr_deref3(a1,a2,a3);
+    A b = a1;
+    int temp = b.x;
+    if (temp == 2) {
+      b = null;
+    }
+    b.x = 0;
+  }
+
+  
+  virtual void test_capture_alias_good_FP() 
+  static presumes this::E<nl:l>  achieves ok this::E<nl:l> * a::A<x:0> & a = b ; 
+  {
+    A a = new A();
+    a.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    A b = a;
+    int temp = a.x;
+    if (temp != 2) {
+      b = null;
+    }
+    b.x = 0;
+  }
   }
