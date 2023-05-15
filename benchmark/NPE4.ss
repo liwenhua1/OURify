@@ -525,5 +525,83 @@ class Bl {
 
 }
 
+  class L {
+    L next;
+
+    virtual Object returnsNullAfterLoopOnList() 
+    static presumes this::L<next:l>  achieves ok this::L<next:l> & res = null; 
+    {
+  }
+
+   virtual void dereferenceAfterLoopOnList() 
+    static presumes this::L<next:l>  achieves err this::L<next:l> & obj = null; 
+
+   {
+    Object obj = this.returnsNullAfterLoopOnList();
+    obj.toString();
+  }
+  }
+
+  class E {
+
+    Objec nl;
+
+  virtual Object getObject() 
+  static presumes this::E<nl:l>  achieves ok this::E<nl:l> & res = null; 
+  {
+    return null;
+  }
+
+  virtual void incr_deref(A z) 
+  static presumes this::E<nl:l> * z::A<x:v>  achieves ok this::E<nl:l> * z::A<x:v+1> ; 
+  {
+    int temp = z.x;
+    temp = temp + 1;
+    z.x = temp;
+  }
+
+  virtual void call_incr_deref_with_alias_bad() 
+  static presumes this::E<nl:l>  achieves err this::E<nl:l> & a = null ; 
+  {
+    A a = new A();
+    a.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    int temp = a.x;
+    if (temp == 2) {
+      a = null;
+    }
+    a.x = 0;
+  }
+
+   virtual void call_incr_deref2_Ok() 
+   static presumes this::E<nl:l>  achieves ok this::E<nl:l> * a::A<x:2> * a1::A<x:0> * a2::A<x:1> ; 
+   {
+    A a = new A();
+    A a1 = new A();
+    A a2 = new A();
+    a.x = 0;
+    a1.x = 0;
+    a2.x = 0;
+    this.incr_deref(a);
+    this.incr_deref(a);
+    this.incr_deref(a1);
+    this.incr_deref(a2);
+    int temp = a.x;
+    int temp1 = a1.x;
+    int temp2 = a2.x;
+
+    
+    if (temp1 != 1) { a1 = null;
+    } else {
+      if (temp2 != 1) {a1 = null;} else {
+        if (temp != 2) {a1 = null;} else {
+        }
+
+      }
+    }
+    a1.x = 0;
+  }
 
 
+  }

@@ -1057,6 +1057,16 @@ match current with
       (match res with 
       Err b -> Err b 
      | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure current'; formula_base_pos = retrivepo b}))
+      
+
+     |(Var {exp_var_name = v1; exp_var_pos = po }, Null a) -> 
+        
+    let old_var = v1 ^ (string_of_int !pos_fix) in
+                let _ = (temp_var := old_var :: !temp_var);(pos_fix := !pos_fix + 1) in 
+                let current' = rename current' v1 old_var in 
+    let pu = Ipure.And ((retrivepure current'),Ipure.BForm (Eq (Var ((v1 , Unprimed), po), Null po, po)),po) in
+
+     Ok (Iformula.Base {formula_base_heap = retriveheap current';formula_base_pure = pu; formula_base_pos = po})
 
 
       | _ -> raise (Foo ("Assign: "^kind_of_Exp lhs ^ " " ^ kind_of_Exp rhs)) 
