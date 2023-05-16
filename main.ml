@@ -800,6 +800,7 @@ match current with
       | Binary {exp_binary_op; exp_binary_oper1; exp_binary_oper2} -> 
         let helper varname = 
           let res = retriveContentfromPure (retrivepure current') varname in
+          (* print_string (Iprinter.string_of_formula_exp (snd res)); *)
           (match res with
           | (true, Null _) -> true
           | _ -> false

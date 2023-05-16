@@ -1,13 +1,8 @@
-data E {Objec nl; }.
-data L {L next; }.
-data Bl {int test1; int test2; }.
-data Nullable {Objec mFld; }.
-data D {int x; }.
-data C {B b; }.
-data B {A a; }.
-data A {int x; }.
+data B {}.
+data A {}.
+data I {}.
 data Objec {}.
 data String {}.
 
-checkentail emp*emp * emp*emp * this::E<l> * a::A<(0+1)+1> & (((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1) |- temp != 2.
+checkentail this::B<> * aorb::A<> & (i <= 0) & (true) |- i > 0.
 print residue.

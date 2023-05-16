@@ -1,503 +1,150 @@
+class Objec {
+    
+	virtual void toString()
+	static	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	dynamic	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	{}
+   Objec ()
+	static
+		presumes true achieves  new_this::Objec<>;
+	{}
+} 
 
 
-  class D {
-    int x;
-  }
-
-  public int preconditionCheckStateTest(D d) {
-    Preconditions.checkState(d != null);
-    return d.x;
-  }
-
-  public void genericMethodSomewhereCheckingForNull(String s) {
-    if (s == null) {}
-  }
-
-
-
-
- 
-
-  int NPEvalueOfFromHashmapBad(HashMap<Integer, Integer> h, int position) {
-    return h.get(position);
-  }
-
-  Integer NPEvalueOfFromHashmapGood(HashMap<Integer, Integer> h, int position) {
-    return h.get(position);
-  }
-
-  void nullPointerExceptionInArrayLengthLoop(Object[] arr) {
-    for (int i = 0; i < arr.length; i++) {
-      Object x = null;
-      x.toString();
-    }
-  }
-
-  Context mContext;
-  ContentResolver mContentResolver;
-
-  public void cursorFromContentResolverNPE(String customClause) {
-    String[] projection = {"COUNT(*)"};
-    String selectionClause = selectionClause = customClause;
-    Cursor cursor =
-        mContext.getContentResolver().query(null, projection, selectionClause, null, null);
-    cursor.close();
-  }
-
-  public int cursorQueryShouldNotReturnNull(SQLiteDatabase sqLiteDatabase) {
-    Cursor cursor = sqLiteDatabase.query("events", null, null, null, null, null, null);
-    try {
-      return cursor.getCount();
-    } finally {
-      cursor.close();
-    }
-  }
-
-
-
-  Object[] arr = new Object[1];
-
-  Object arrayReadShouldNotCauseSymexMemoryError(int i) {
-    arr[i].toString();
-    return null;
-  }
-
-  void nullPointerExceptionCallArrayReadMethod() {
-    arr[0] = new Object();
-    arrayReadShouldNotCauseSymexMemoryError(0).toString();
-  }
-
-  public void FP_sinkWithNeverNullSource() {
-    NeverNullSource source = new NeverNullSource();
-    T t = source.get();
-    t.f();
-  }
-
-  public void FP_otherSinkWithNeverNullSource() {
-    SomeLibrary source = new SomeLibrary();
-    T t = source.get();
-    t.f();
-  }
-
-  
-
-  native boolean test1();
-
-  native boolean test2();
-
-
-
-
-
-  // latent because we don't know if test1() can return "true"
-  // arguably should be reported?
- 
-
-
-
-
-  private Object mOkObj = new Object();
-
-
-  
-
-  private @Nullable Object mNullableField;
-
-  public void nullableFieldReassign1() {
-    if (mNullableField == null) {
-      mNullableField = mOkObj;
-    }
-    mNullableField.toString();
-  }
-
-  public void nullableFieldReassign2(Object okObj) {
-    if (mNullableField == null) {
-      mNullableField = okObj;
-    }
-    mNullableField.toString();
-  }
-
-  public void nullableFieldReassign3(Object param) {
-    mNullableField = param;
-    mNullableField.toString();
-  }
-
-  public Object nullableGetter() {
-    return mNullableField;
-  }
-
-  public void FN_derefNullableGetter() {
-    Object o = nullableGetter();
-    o.toString();
-  }
-
-  public @Nullable Object nullableRet(boolean b) {
-    if (b) {
+class I {
+    virtual Objec defaultMethod1() 
+    static presumes this::I<> achieves ok this::I<> & res = null;
+    dynamic presumes this::I<> achieves ok this::I<> & res = null;
+    {
       return null;
     }
-    return new Object();
-  }
 
-  public void derefNullableRet(boolean b) {
-    Object ret = nullableRet(b);
-    ret.toString();
-  }
-
-  public void derefNullableRetOK(boolean b) {
-    Object ret = nullableRet(b);
-    if (ret != null) {
-      ret.toString();
+    virtual Object defaultMethod2() 
+    static presumes this::I<> achieves ok this::I<> * res::Objec<>;
+    dynamic presumes this::I<> achieves ok this::I<> * res::Objec<>;
+    {
+      
+      return new Objec();
     }
   }
 
-  public native @Nullable Object undefNullableRet();
+ class A extends I {
 
-  public void derefUndefNullableRet() {
-    Object ret = undefNullableRet();
-    ret.toString();
-  }
+    A ()
+	  static
+		presumes true achieves  new_this::A<>;
+	{}
 
-  public void derefUndefNullableRetOK() {
-    Object ret = undefNullableRet();
-    if (ret != null) {
-      ret.toString();
+    inherit Objec defaultMethod1() 
+    static presumes this::A<> achieves ok this::A<> & res = null;
+    dynamic presumes this::I<>A<>  achieves ok this::I<>A<> & res = null;
+    {
+    }
+
+    inherit Objec defaultMethod2() 
+    static presumes this::A<> achieves ok this::A<> * res::Objec<>;
+    dynamic presumes this::I<>A<> achieves ok this::I<>A<> * res::Objec<>;
+    {
+      
+    }
+
+    virtual void defaultCallNPE() 
+    static presumes this::A<> achieves err this::A<> & temp = null;
+    {
+      Objec temp = this.defaultMethod1();
+      temp.toString();
+    }
+
+    virtual void defaultCallOk() 
+    static presumes this::A<> achieves ok this::A<> * temp :: Objec<>;
+    {
+      Objec temp = this.defaultMethod2();
+      temp.toString();
     }
   }
 
-  void assumeUndefNullableIdempotentOk() {
-    if (undefNullableRet() != null) {
-      undefNullableRet().toString();
+ class B extends A {
+
+   B ()
+	  static
+		presumes true achieves  new_this::B<>;
+	{}
+    override Objec defaultMethod1() 
+    static presumes this::B<> achieves ok this::B<> * res :: Objec<>;
+    dynamic presumes this::I<>A<>  achieves ok this::I<>A<> & res = null;
+    dynamic presumes this::B<>  achieves ok this::B<> * res :: Objec<>;
+    {
+      return new Objec();
     }
-  }
 
-  public Object undefNullableWrapper() {
-    return undefNullableRet();
-  }
-
-  public void derefUndefNullableRetWrapper() {
-    undefNullableWrapper().toString();
-  }
-
-  private int returnsThreeOnlyIfRetNotNull(Object obj) {
-    if (obj == null) {
-      return 2;
+    override Objec defaultMethod2() 
+    static presumes this::B<> achieves ok this::B<> & res = null;
+    dynamic presumes this::I<>A<>  achieves ok this::I<>A<> * res :: Objec<>;
+    dynamic presumes this::B<>  achieves ok this::B<> & res = null;
+    {
+      return null;
     }
-    return 3;
-  }
 
-  public void testNullablePrecision() {
-    Object ret = undefNullableRet();
-    if (returnsThreeOnlyIfRetNotNull(ret) == 3) {
-      ret.toString(); // shouldn't warn here
+    virtual void overridenCallOk() 
+    static presumes this::B<> achieves ok this::B<> * temp::Objec<>;
+    {
+      Objec temp = this.defaultMethod1();
+      temp.toString();
     }
-  }
 
-  public @Nullable String FN_testSystemGetPropertyArgument() {
-    String s = System.getProperty(null);
-    return s;
-  }
-
-  public void FN_testSystemGetPropertyReturn() {
-    String s = System.getProperty("");
-    int n = s.length();
-  }
-
-  Object retUndefined() {
-    return "".toString(); // toString is a skip function
-  }
-
-  Object derefUndefinedCallee() {
-    // if retUndefined() is handled incorrectly, we get a symexec_memory_error here
-    retUndefined().toString();
-    return null;
-  }
-
-  void derefNull() {
-    // should be NPE, but will not be reported if we handled retUndefined() incorrectly
-    derefUndefinedCallee().toString();
-  }
-
-  @SuppressLint("NULL_DEREFERENCE")
-  void shouldNotReportNPE() {
-    Object o = null;
-    o.toString();
-  }
-
-  void shouldNotReportOnSkippedSource() {
-    Object o = SkippedSourceFile.createdBySkippedFile();
-    o.toString();
-  }
-
-  int nullListFiles(String pathname) {
-    File dir = new File(pathname);
-    File[] files = dir.listFiles();
-    return files.length; // expect possible NullPointerException as files == null is possible
-  }
-
-  native Object unknownFunc();
-
-  void nullDerefernceReturnOfSkippedFunctionBad() {
-    Object object = unknownFunc();
-    if (object == null) {
-      object.toString();
+    virtual void overridenCallNPE() 
+    static presumes this::B<> achieves err this::B<> & temp = null;
+    {
+      Objec temp = this.defaultMethod2();
+      temp.toString();
     }
-  }
+  
 
-  native @Nonnull Object doesNotReturnNull();
-
-  void noNPEWhenCallingSkippedNonnullAnnotatedMethodGood() {
-    Object object = doesNotReturnNull();
-    if (object == null) {
-      object.toString();
+  virtual void uncertainCallMethod1NPE_latent(int i) 
+  static presumes this::B<> & i > 0 achieves ok this::B<> * aorb::B<> * temp::Objec<> & i > 0 ;
+  static presumes this::B<> & i <= 0 achieves err this::B<> * aorb::A<> & temp=null & i <= 0 ;
+  {
+    A aorb = new A();
+    if (i > 0) { 
+      aorb = new B();
     }
+    Objec temp = aorb.defaultMethod1();
+    temp.toString();
   }
 
-  Object callUnknownFunc() {
-    return unknownFunc();
-  }
-
-  void dontReportOnNullableDirectReassignmentToUnknown(@Nullable Object o) {
-    o = unknownFunc();
-    o.toString();
-  }
-
-  void dontReportOnNullableIndirectReassignmentToUnknown(@Nullable Object o) {
-    o = callUnknownFunc();
-    o.toString();
-  }
-
-  @Nullable
-  Object wrapUnknownFuncWithNullable() {
-    return unknownFunc();
-  }
-
-  void deferenceNullableMethodCallingSkippedMethodBad() {
-    wrapUnknownFuncWithNullable().toString();
-  }
-
-  String nullTryLock(FileChannel chan) throws IOException {
-    FileLock lock = chan.tryLock();
-    return lock.toString(); // expect possible NullPointerException as lock == null is possible
-  }
-
-  String tryLockThrows(FileChannel chan) {
-    try {
-      FileLock lock = chan.tryLock();
-      return (lock != null ? lock.toString() : "");
-    } catch (IOException e) {
-      Object o = null;
-      return o.toString(); // expect NullPointerException as tryLock can throw
+  virtual void uncertainCallMethod2NPE(int i) 
+  static presumes this::B<> & i > 0 achieves err this::B<> * aorb::B<> & temp=null & i > 0 ;
+  static presumes this::B<> & i <= 0 achieves ok this::B<> * aorb::A<> * temp::Objec<> & i <= 0 ;
+  {
+    A aorb = new A();
+    if (i > 0) { 
+      aorb = new B();
     }
+    Objec temp = aorb.defaultMethod2();
+    temp.toString();
+  }
+ }
+
+class IntExample {
+
+  int x;
+
+  virtual int testAssignNonNullOk() 
+  static presumes this::IntExample<x:v>  achieves ok this::IntExample<x:1> & res = 2 ;
+  {
+    this.x = 1;
+    int temp = this.x;
+    temp = temp + 1;
+    return temp;
   }
 
-  class L {
-    L next;
+  virtual Double FN_testdReadNullableBad() 
+  static presumes this::IntExample<x:null>  achieves err this::IntExample<x:null>  ;
+  {
+    int temp = this.x;
+    int temp2 = temp + 1;
+    return temp2;
   }
-
-  Object returnsNullAfterLoopOnList(L l) {
-    while (l != null) {
-      l = l.next;
-    }
-    return null;
-  }
-
-  void dereferenceAfterLoopOnList(L l) {
-    Object obj = returnsNullAfterLoopOnList(l);
-    obj.toString();
-  }
-
-  void dereferenceAfterUnlock1(Lock l) {
-    l.unlock();
-    String s = l.toString();
-    s = null;
-    s.toString(); // Expect NPE here
-  }
-
-  void dereferenceAfterUnlock2(Lock l) {
-    synchronized (l) {
-      String b = null;
-    }
-    String s = l.toString();
-    s = null;
-    s.toString(); // Expect NPE here
-  }
-
-  void optionalNPE(Optional<Object> o) {
-    o.orNull().toString();
-  }
-
-  void FP_stringConstantEqualsTrueNotNPE() {
-    final String c1 = "Test string!";
-    final String c2 = "Test string!";
-    String s = null;
-    if (c1.equals(c1)) {
-      s = "safe";
-    }
-    s.toString(); // No NPE
-    s = null;
-    if (c1.equals(c2)) {
-      s = "safe";
-    }
-    s.toString(); // No NPE
-  }
-
-  void stringConstantEqualsFalseNotNPE_FP() {
-    // This won't actually cause an NPE, but our current model for String.equals
-    // returns boolean_undefined for all cases other than String constant
-    // equality. Consider handling constant inequality in the future.
-    final String c1 = "Test string 1";
-    final String c2 = "Test string 2";
-    String s = null;
-    if (!c1.equals(c2)) {
-      s = "safe";
-    }
-    s.toString(); // No NPE
-  }
-
-  String getString2() {
-    return "string 2";
-  }
-
-  void stringVarEqualsFalseNPE() {
-    final String c1 = "Test string 1";
-    String c2 = "Test " + getString2();
-    String s = null;
-    if (!c1.equals(c2)) {
-      s.toString(); // NPE
-    }
-  }
-
-  String assertParameterNotNullableOk(@Nullable Object object) {
-    return Assertions.assertNotNull(object).toString();
-  }
-
-  interface I {
-    @Nullable Object mObject = null;
-  }
-
-  class E implements I {
-
-    void FN_dereferenceNullableInterfaceFieldBad() {
-      mObject.toString();
-    }
-  }
-
-  Object getObject() {
-    return null;
-  }
-
-  void FN_addNullToImmutableListBuilderBad() {
-    ImmutableList.Builder<Object> listBuilder = ImmutableList.builder();
-    listBuilder.add(getObject());
-  }
-
-  void incr_deref(A a1, A a2) {
-    a1.x++;
-    a2.x++;
-  }
-
-  void call_incr_deref_with_alias_bad() {
-    A a = new A();
-    a.x = 0;
-    incr_deref(a, a);
-    if (a.x == 2) {
-      a = null;
-    }
-    a.x = 0;
-  }
-
-  void call_incr_deref_with_alias_Ok() {
-    A a = new A();
-    a.x = 0;
-    incr_deref(a, a);
-    if (a.x != 2) {
-      a = null;
-    }
-    a.x = 0;
-  }
-
-  // An other example wich require alias specialization, but with interfering calls
-  // with and without alias
-  void incr_deref2(A a1, A a2) {
-    a1.x++;
-    a2.x++;
-  }
-
-  void call_incr_deref2_bad() {
-    A a = new A();
-    A a1 = new A();
-    A a2 = new A();
-    a.x = 0;
-    a1.x = 0;
-    a2.x = 0;
-    incr_deref2(a, a);
-    incr_deref2(a1, a2);
-    if (a1.x == 1 && a2.x == 1 && a.x == 2) {
-      a1 = null;
-    }
-    a1.x = 0;
-  }
-
-  void call_incr_deref2_Ok() {
-    A a = new A();
-    A a1 = new A();
-    A a2 = new A();
-    a.x = 0;
-    a1.x = 0;
-    a2.x = 0;
-    incr_deref2(a, a);
-    incr_deref2(a1, a2);
-    if (!(a1.x == 1 && a2.x == 1 && a.x == 2)) {
-      a1 = null;
-    }
-    a1.x = 0;
-  }
-
-  // An other example wich require multiple alias specializations
-  void incr_deref3(A a1, A a2, A a3) {
-    a1.x++;
-  }
-
-  void call_incr_deref3_bad() {
-    A a1 = new A();
-    A a2 = new A();
-    A a3 = new A();
-    incr_deref3(null, null, null);
-  }
-
-  interface AFunction {
-    void run(A a);
-  }
-
-  void test_capture_alias_bad() {
-    A a = new A();
-    a.x = 0;
-    AFunction incr_deref =
-        (a2) -> {
-          a.x++;
-          a2.x++;
-        };
-    incr_deref.run(a);
-    A b = a;
-    if (a.x == 2) {
-      b = null;
-    }
-    b.x = 0;
-  }
-
-  // FP because incr_deref.run(a) results in an unknown call
-  void test_capture_alias_good_FP() {
-    A a = new A();
-    a.x = 0;
-    AFunction incr_deref =
-        (a2) -> {
-          a.x++;
-          a2.x++;
-        };
-    incr_deref.run(a);
-    A b = a;
-    if (a.x != 2) {
-      b = null;
-    }
-    b.x = 0;
-  }
+}
