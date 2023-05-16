@@ -1,8 +1,13 @@
+data C {}.
 data B {}.
 data A {}.
-data I {}.
+data WithField {Supertype mField; }.
+data Subtype {}.
+data Supertype {}.
+data Impl {}.
 data Objec {}.
+data Interface {}.
 data String {}.
 
-checkentail this::Objec<> & ((true) & (((this = temp) & (true)) & ((true) & (true)))) & (((i <= 0) & (true)) & (true)) |- emp*emp * emp*temp::Objec<> & (((i <= 0) & (true)) & (true)) & (((this = temp) & (true)) & ((true) & (true))).
+checkentail (exists temp: this::C<> & ((true) & (((this = c) & (true)) & ((true) & (true)))) & ((true) & (true))) |- (exists temp: emp*emp*c::C<> & ((true) & (true)) & (((this = c) & (true)) & ((true) & (true)))).
 print residue.

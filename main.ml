@@ -1252,13 +1252,15 @@ let entail_for_dynamic d1 d2 parent_spec =
   let type_info = List.fold_right (fun (a,b) acc -> a :: acc) node [] in
   let node1 = snd (retriveContentfromNode (remove_ok_err d1) "this") in
   let new_node = List.fold_right (fun (a,b) acc -> if (not_in a type_info) then acc else (a,b) :: acc) node1 [] in
+  if (List.length new_node) == 0 then false else
   let new_d1 = update_node_content d1 "this" new_node in 
   let node2 = snd (retriveContentfromNode  (remove_ok_err d2) "this") in
   let new_node2 = List.fold_right (fun (a,b) acc -> if (not_in a type_info) then acc else (a,b) :: acc) node2 [] in
   let new_d2 = update_node_content d2 "this" new_node2 in 
-  
+  (* print_endline (Iprinter.string_of_spec (singlised_heap pd1));
+  print_endline (Iprinter.string_of_spec (singlised_heap new_d1)); *)
   let res =subsumption_check_dynamic_method (singlised_heap pd1) (singlised_heap pd2) (singlised_heap new_d1) (singlised_heap new_d2) in
-  
+
   if (res == true) then true else false
  
 let rec check_static_entail dynamic static_list= 
@@ -1266,15 +1268,19 @@ let rec check_static_entail dynamic static_list=
     match static_list with
     | [] -> (false,false)
     | (sp,sq)::xs -> let t1 =fst (List.hd ( snd (retriveContentfromNode (remove_ok_err sp) "this"))) in 
+                      
                      
                      let t2 =fst (List.hd ( snd (retriveContentfromNode (remove_ok_err (fst dynamic)) "this"))) in 
-                     let t3 =fst (List.hd (List.rev ( snd (retriveContentfromNode (remove_ok_err (fst dynamic)) "this")))) in 
                      
+                     let t3 =fst (List.hd (List.rev ( snd (retriveContentfromNode (remove_ok_err (fst dynamic)) "this")))) in 
+                    
                      if String.compare t1 t2 == 0 then 
                       let entail_for_static = subsumption_check_single_method sp sq (fst dynamic) (snd dynamic) in if entail_for_static == true then (true,true) else (false,false)
                       
                        else if (not (String.compare t3 t1 == 0)) then (false,true) else 
-                     let entail_for_static = subsumption_check_single_method sp sq (fst dynamic) (snd dynamic) in if entail_for_static == true then (false,true) else check_static_entail dynamic xs
+                     let entail_for_static = subsumption_check_single_method sp sq (fst dynamic) (snd dynamic) in 
+                     (* print_endline (string_of_bool entail_for_static); *)
+                     if entail_for_static == true then (false,true) else check_static_entail dynamic xs
 let rec chang_heap_to_emp vname hp = 
                       match hp with 
                       | Iformula.HTrue -> Iformula.HTrue
@@ -1317,7 +1323,9 @@ let rec check_dynamic_entail current_spec parent_spec =
   (* print_int (List.length parent_spec); *)
   match parent_spec with 
   | [] -> false
-  | x :: xs -> let res = entail_for_dynamic (fst current_spec) (snd current_spec) x in if res == true then true else check_dynamic_entail current_spec xs
+  | x :: xs -> let res = entail_for_dynamic (fst current_spec) (snd current_spec) x in 
+  (* print_endline (string_of_bool res); *)
+  if res == true then true else check_dynamic_entail current_spec xs
 
 let oop_verification_method (obj:Iast.data_decl) (decl: Iast.proc_decl) : string = 
   let () = print_string ("\n\n========== Module: "^ decl.proc_name ^ " in Object " ^ obj.data_name ^" ==========\n") in

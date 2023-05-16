@@ -1,8 +1,13 @@
+data C {}.
 data B {}.
 data A {}.
-data I {}.
+data WithField {Supertype mField; }.
+data Subtype {}.
+data Supertype {}.
+data Impl {}.
 data Objec {}.
+data Interface {}.
 data String {}.
 
-checkentail this::B<> * aorb::A<> & (i <= 0) & (true) |- i > 0.
+checkentail emp*this::C<> * emp * c::C<> & ((true) & (true)) & (temp = 52) |- temp = 52.
 print residue.

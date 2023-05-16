@@ -1,9 +1,13 @@
-data IntExample {int x; }.
+data C {}.
 data B {}.
 data A {}.
-data I {}.
+data WithField {Supertype mField; }.
+data Subtype {}.
+data Supertype {}.
+data Impl {}.
 data Objec {}.
+data Interface {}.
 data String {}.
 
-checkentail this::IntExample<null> & true |- (exists temp2, temp: this::IntExample<null> & (true) & (temp = null)).
+checkentail this::C<> * c::C<> & o = null |- (exists temp: emp*this::C<> * emp * c::C<> & (((true) & (true)) & (temp = 52)) & (o = null)).
 print residue.
