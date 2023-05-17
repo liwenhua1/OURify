@@ -1,204 +1,167 @@
-public class DynamicDispatch {
-
-  static interface Interface {
-    public Object foo();
-  }
-
-  static class Impl implements Interface {
-    @Override
-    public Object foo() {
-      return null;
-    }
-  }
-
-  static void interfaceShouldNotCauseFalseNegativeEasyBad() {
-    Interface i = new Impl();
-    // should be a warning since Impl's implementation of foo returns null
-    i.foo().toString();
-  }
-
-  static void FN_interfaceShouldNotCauseFalseNegativeHardOK(Interface i) {
-    i.foo().toString();
-  }
-
-  static void callWithBadImplementationBad_FN(Impl impl) {
-    FN_interfaceShouldNotCauseFalseNegativeHardOK(impl);
-  }
-
-  static class Supertype {
-    Object foo() {
-      return new Object();
-    }
-
-    Object bar() {
-      return null;
-    }
-  }
-
-  static class Subtype extends Supertype {
-    @Override
-    Object foo() {
-      return null;
-    }
-
-    @Override
-    Object bar() {
-      return new Object();
-    }
-  }
-
-  static void dynamicDispatchShouldNotCauseFalseNegativeEasyBad() {
-    Supertype o = new Subtype();
-    // should report a warning because we know the dynamic type of o is Subtype
-    o.foo().toString();
-  }
-
-  static void dynamicDispatchShouldNotCauseFalsePositiveEasyOK() {
-    Supertype o = new Subtype();
-    // should not report a warning because we know the dynamic type of o is Subtype
-    o.bar().toString();
-  }
-
-  static void dynamicDispatchShouldNotReportWhenCallingSupertypeOK(Supertype o) {
-    // should not report a warning because the Supertype implementation
-    // of foo() does not return null
-    o.foo().toString();
-  }
-
-  static void dynamicDispatchShouldReportWhenCalledWithSubtypeParameterBad_FN(Subtype o) {
-    // should report a warning because the Subtype implementation
-    // of foo() returns null
-    dynamicDispatchShouldNotReportWhenCallingSupertypeOK(o);
-  }
-
-  static Object dynamicDispatchWrapperFoo(Supertype o) {
-    return o.foo();
-  }
-
-  static Object dynamicDispatchWrapperBar(Supertype o) {
-    return o.bar();
-  }
-
-  static void dynamicDispatchCallsWrapperWithSupertypeOK() {
-    // Should not report because Supertype.foo() does not return null
-    Supertype o = new Supertype();
-    dynamicDispatchWrapperFoo(o).toString();
-  }
-
-  static void dynamicDispatchCallsWrapperWithSupertypeBad() {
-    // Should report because Supertype.bar() returns null
-    Supertype o = new Supertype();
-    dynamicDispatchWrapperBar(o).toString();
-  }
-
-  static void dynamicDispatchCallsWrapperWithSubtypeBad() {
-    // Should report because Subtype.foo() returns null
-    Supertype o = new Subtype();
-    dynamicDispatchWrapperFoo(o).toString();
-  }
-
-  static void dynamicDispatchCallsWrapperWithSubtypeOK() {
-    // Should not report because Subtype.bar() does not returns null
-    Supertype o = new Subtype();
-    dynamicDispatchWrapperBar(o).toString();
-  }
-
-  static class WithField {
-
-    Supertype mField;
-
-    WithField(Supertype t) {
-      mField = t;
-    }
-
-    static void dispatchOnFieldOK() {
-      Supertype subtype = new Subtype();
-      WithField object = new WithField(subtype);
-      object.mField.bar().toString();
-    }
-
-    static void dispatchOnFieldBad() {
-      Supertype subtype = new Subtype();
-      WithField object = new WithField(subtype);
-      object.mField.foo().toString();
-    }
-  }
-
-  private Object callFoo(Supertype o) {
-    return o.foo();
-  }
-
-  void dynamicResolutionWithPrivateMethodBad() {
-    Supertype subtype = new Subtype();
-    callFoo(subtype).toString();
-  }
-
-  Object variadicMethod(Supertype... args) {
-    if (args.length == 0) {
-      return null;
-    } else {
-      return args[0].foo();
-    }
-  }
-
-  void dynamicResolutionWithVariadicMethodBad() {
-    Supertype subtype = new Subtype();
-    variadicMethod(subtype, null, null).toString();
-  }
+class A {
+  int i;
 }
 
-class InheritanceDispatch {
-  class A {
-    int foo() {
-      return 32;
+class Objec {
+    
+	virtual void toString()
+	static	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	dynamic	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	{}
+
+  virtual int length()
+	static	
+	      presumes this::Objec<> achieves  this::Objec<> & res = 5;
+	{}
+
+   Objec ()
+	static
+		presumes true achieves new_this::Objec<>;
+	{}
+} 
+
+class NullPointerExceptionsMoreTests {
+
+  virtual int testNullStringDereferencedBad() 
+  static presumes this::NullPointerExceptionsMoreTests<> achieves err this::NullPointerExceptionsMoreTests<> & s= null;
+  {
+    Objec s = new Objec();
+    int j = s.length();
+    s = null;
+    int temp = s.length();
+    j = j + temp;
+    return 42;
+  }
+
+  virtual int testBrachesAvoidNullPointerExceptionOK(int k) 
+  static presumes this::NullPointerExceptionsMoreTests<> & k > 10 achieves ok this::NullPointerExceptionsMoreTests<> & s= null & res = 100 & k >10;
+  static presumes this::NullPointerExceptionsMoreTests<> & k = 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 5 & k=10;
+  static presumes this::NullPointerExceptionsMoreTests<> & k < 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 100 & k < 10;
+  {
+    Objec s = new Objec();
+    int j = 100;
+    if (k > 10) {
+      s = null; 
     }
-  }
-
-  class B extends A {
-    int foo() {
-      return 52;
+    if (k == 10) {
+      int temp = s.length();
+      j = temp;
     }
+    return j;
   }
 
-  class C extends B {}
-
-  A getB() {
-    return new B();
+  virtual void testParameterOk(A arg) 
+  static presumes this::NullPointerExceptionsMoreTests<> * arg::A<i:v> achieves ok this::NullPointerExceptionsMoreTests<> * arg::A<i:17>;
+  static presumes this::NullPointerExceptionsMoreTests<> & arg = null achieves err this::NullPointerExceptionsMoreTests<> & arg = null;
+  
+  {
+    arg.i = 17;
   }
 
-  A getC() {
-    return new C();
-  }
+  virtual int testArithmeticOk(int k) 
+  static presumes this::NullPointerExceptionsMoreTests<> & k > 10 achieves ok this::NullPointerExceptionsMoreTests<> & s= null & res = 100 & k >10;
+  static presumes this::NullPointerExceptionsMoreTests<> & k <= 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 5 & k=10;
+  static presumes this::NullPointerExceptionsMoreTests<> & k <= 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 5 & k<10;
 
-  void dispatch_to_B_ok() {
-    A b = getB();
-    if (b.foo() == 32) {
-      Object o = null;
-      o.toString();
+    {
+  
+    Objec s = new Objec();
+    int j = 100;
+    if (k > 10) {
+      s = null; 
     }
+    if (k == 10) {
+      int temp = s.length();
+      j = temp;
+    }
+    if (k < 10) {
+      int temp = s.length();
+      j = temp;
+    }
+    return j;
   }
 
-  void dispatch_to_B_bad() {
-    A b = getB();
-    if (b.foo() == 52) {
-      Object o = null;
-      o.toString();
+   virtual int testArithmeticOneOK(int k) 
+    static presumes this::NullPointerExceptionsMoreTests<> & k > 10 achieves ok this::NullPointerExceptionsMoreTests<> & s= null & res = 100 & k >10;
+    static presumes this::NullPointerExceptionsMoreTests<> & k <= 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 5 & k=10;
+    {Objec s = new Objec();
+    int j = 100;
+    if (k > 10) {
+      s = null; 
     }
+    int temp = k + k ;
+    if (temp == 20) {
+       int temp1 = s.length();
+      j = temp1;
+    }
+    return j;
   }
 
-  void dispatch_to_A_bad() {
-    A a = new A();
-    if (a.foo() == 32) {
-      Object o = null;
-      o.toString();
-    }
+  virtual int f_ident(int k) 
+  static presumes this::NullPointerExceptionsMoreTests<> & k = v achieves ok this::NullPointerExceptionsMoreTests<> & k = v & res = v;
+
+  {
+    return k;
   }
 
-  void dispatch_to_C_bad() {
-    A c = getC();
-    if (c.foo() == 52) {
-      Object o = null;
-      o.toString();
+  virtual int FP_testArithmeticTwo(int k)
+       static presumes this::NullPointerExceptionsMoreTests<> & k > 10 achieves ok this::NullPointerExceptionsMoreTests<> & s= null & res = 100 & k >10;
+       static presumes this::NullPointerExceptionsMoreTests<> & k <= 10 achieves ok this::NullPointerExceptionsMoreTests<> * s::Objec<> & res = 5 & k=10;
+
+   {
+   
+    Objec s = new Objec();
+    int j = 100;
+    if (k > 10) {
+      s = null; 
     }
+     int temp = this.f_ident(k);
+    if ( temp == 10) {
+
+      int temp1 = s.length();
+      j = temp1;
+    }
+    return j;
   }
+
+}
+
+class OtherClass {
+
+  OtherClass x;
+
+  OtherClass ()
+	static
+		presumes true achieves new_this::OtherClass<x:null>;
+	{}
+
+
+  virtual OtherClass canReturnNull() 
+  static presumes this::OtherClass<x:null> achieves ok this::OtherClass<x:null> & res = null;
+
+  {
+    int z = this.x;
+    return z;
+  }
+
+  virtual String buggyMethodBad() 
+  static presumes this::OtherClass<x:null> achieves err this::OtherClass<x:null> * o::OtherClass<x:null>;
+  {
+    OtherClass o = new OtherClass();
+    int temp = o.canReturnNull();
+    temp.toString();
+  }
+
+  virtual void testingNullsafeLocalMode() 
+  static presumes this::OtherClass<x:null> achieves err this::OtherClass<x:null> * o::OtherClass<x:null>;
+
+  {
+    OtherClass o = new OtherClass();
+    int temp = o.canReturnNull();
+    temp.getClass();
+  }
+
+ 
 }

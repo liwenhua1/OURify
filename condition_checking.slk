@@ -1,13 +1,7 @@
-data C {}.
-data B {}.
-data A {}.
-data WithField {Supertype mField; }.
-data Subtype {}.
-data Supertype {}.
-data Impl {}.
+data NullPointerExceptionsMoreTests {}.
 data Objec {}.
-data Interface {}.
+data A {int i; }.
 data String {}.
 
-checkentail emp*this::C<> * emp * c::C<> & ((true) & (true)) & (temp = 52) |- temp = 52.
+checkentail emp*s::Objec<> * this::NullPointerExceptionsMoreTests<> & (temp = 10) & ((((k <= 10) & (true)) & (j = 100)) & ((k = v) & (temp = v))) |- false & false.
 print residue.

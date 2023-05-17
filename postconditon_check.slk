@@ -1,13 +1,8 @@
-data C {}.
-data B {}.
-data A {}.
-data WithField {Supertype mField; }.
-data Subtype {}.
-data Supertype {}.
-data Impl {}.
+data OtherClass {OtherClass x; }.
+data NullPointerExceptionsMoreTests {}.
 data Objec {}.
-data Interface {}.
+data A {int i; }.
 data String {}.
 
-checkentail this::C<> * c::C<> & o = null |- (exists temp: emp*this::C<> * emp * c::C<> & (((true) & (true)) & (temp = 52)) & (o = null)).
+checkentail this::OtherClass<null> * o::OtherClass<null> & true |- (exists temp: this::OtherClass<null> * emp * o::OtherClass<null> & ((true) & (true)) & (temp = null)).
 print residue.

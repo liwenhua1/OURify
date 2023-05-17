@@ -574,12 +574,14 @@ let rec search_replace (var: ident * P.exp) formu =
     | _ -> raise (Foo "other heapF") in
   let finished_heap = helper1 (retriveheap state) formula in
   let rec check_head_1 v f =
+    (* print_endline (Iprinter.string_of_pure_formula f); *)
     match f with 
     | Ipure.BForm (BConst (true,a)) -> (false, Ipure.BForm (BConst (true,a)))
     | Ipure.And (a,b,c) -> let (r1,r2) = (check_head_1 v a) in if r1 == true then (true, r2) else (check_head_1 v b)
     | Ipure.BForm Eq (Var a, b,c) -> if String.compare (fst (fst a)) v == 0 then (true, Ipure.BForm (Eq (Var a, b,c))) else (false, Ipure.BForm (Eq (Var a, b,c))) 
     | Ipure.BForm Eq (b, Var a,c) -> if String.compare (fst (fst a)) v == 0 then (true, Ipure.BForm (Eq (Var a, b,c))) else (false, Ipure.BForm (Eq (Var a, b,c))) 
     | Ipure.BForm Eq (IConst a,IConst b,c) -> (false, Ipure.BForm (Eq (IConst a, IConst b,c))) 
+    | Ipure.BForm Eq (Null a,Null b,c) -> (false, Ipure.BForm (Eq (Null a,Null b,c))) 
     |_ -> raise (Foo "other pureF21") in
   let rec check_replace_pure pu fo =
     let rec h3 exp f = 
@@ -1092,12 +1094,15 @@ match current with
             
                 | _ ->
                 let pure_condition = Ipure.BForm (transfer_formula_from_program_to_pure a.exp_cond_condition) in
+                let pure_condition = Ipure.And (pure_condition, retrivepure current',a.exp_cond_pos) in
+                let current' = (Iformula.Base {formula_base_heap=retriveheap current';formula_base_pure=pure_condition;formula_base_pos=a.exp_cond_pos}) in
                 let tt = !temp_var in 
                 let () = temp_var := [] in
-                let () = entail_checking "condition_checking.slk" (singlised_heap (Ok current')) (Ok (Iformula.Base {formula_base_heap=Iformula.HTrue;formula_base_pure=pure_condition;formula_base_pos=a.exp_cond_pos})) in 
+                let () = entail_checking "condition_checking.slk" (singlised_heap (Ok current')) (Ok (Iformula.Base {formula_base_heap=Iformula.HFalse;formula_base_pure= Ipure.mkFalse a.exp_cond_pos;formula_base_pos=a.exp_cond_pos})) in 
                 let () = temp_var := tt in
                 let content = Asksleek.asksleek "condition_checking.slk" in
-                Asksleek.entail_res content ) in
+                let q = not (Asksleek.entail_res content)  in 
+                q ) in
                 (match res with
                 | true-> oop_verification_method_aux obj decl a.exp_cond_then_arm (Ok current')
                 | false-> oop_verification_method_aux obj decl a.exp_cond_else_arm (Ok current'))

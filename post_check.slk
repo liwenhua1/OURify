@@ -1,13 +1,6 @@
-data C {}.
-data B {}.
-data A {}.
-data WithField {Supertype mField; }.
-data Subtype {}.
-data Supertype {}.
-data Impl {}.
 data Objec {}.
-data Interface {}.
+data A {int i; }.
 data String {}.
 
-checkentail this::C<> & res = 52 |- this::C<> & res = 52.
+checkentail this::Objec<> & true |- this::Objec<> & true.
 print residue.
