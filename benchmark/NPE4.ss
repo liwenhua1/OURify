@@ -72,8 +72,6 @@
 
     virtual int thisNotNullBad() 
     static 
-        presumes this=null achieves ok this = null & res = 0 ;
-    static 
         presumes this::A<x:v> achieves err this::A<x:v> & a=null ;
     
     {

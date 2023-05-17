@@ -1,8 +1,13 @@
-data OtherClass {OtherClass x; }.
-data NullPointerExceptionsMoreTests {}.
+data E {Objec nl; }.
+data L {L next; }.
+data Bl {int test1; int test2; }.
+data Nullable {Objec mFld; }.
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
+data A {int x; }.
 data Objec {}.
-data A {int i; }.
 data String {}.
 
-checkentail this::OtherClass<null> * o::OtherClass<null> & true |- (exists temp: this::OtherClass<null> * emp * o::OtherClass<null> & ((true) & (true)) & (temp = null)).
+checkentail this::E<l> * a::A<0> & a = b |- (exists temp: emp*emp * emp*emp * this::E<l> * a::A<0> & (((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1)).
 print residue.

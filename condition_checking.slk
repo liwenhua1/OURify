@@ -1,7 +1,13 @@
-data NullPointerExceptionsMoreTests {}.
+data E {Objec nl; }.
+data L {L next; }.
+data Bl {int test1; int test2; }.
+data Nullable {Objec mFld; }.
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
+data A {int x; }.
 data Objec {}.
-data A {int i; }.
 data String {}.
 
-checkentail emp*s::Objec<> * this::NullPointerExceptionsMoreTests<> & (temp = 10) & ((((k <= 10) & (true)) & (j = 100)) & ((k = v) & (temp = v))) |- false & false.
+checkentail emp*emp * emp*emp * this::E<l> * a::A<(0+1)+1> & (temp != 2) & ((((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1)) |- false & false.
 print residue.

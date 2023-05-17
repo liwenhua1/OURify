@@ -151,3 +151,53 @@ class FastCnt extends Cnt {
 	int bak;
 }
 
+class Objec {
+    
+	virtual void toString()
+	static	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	dynamic	
+	      presumes this::Objec<> achieves  this::Objec<>;
+	{}
+   Objec ()
+	static
+		presumes true achieves  new_this::Objec<>;
+	{}
+} 
+class Mustbug {
+    Objec x;
+
+    Mustbug ()
+	static presumes true achieves  new_this::Mustbug<x:null>;
+	{}
+
+    virtual void error1()
+    presumes true achieves err true;
+	
+    {
+        int h = null;
+        h.toString();
+
+    }
+
+    virtual void error2()
+    presumes true achieves err  h::Mustbug<x:null> & temp=null;
+	
+    {
+        Mustbug h = new Mustbug();
+        Objec temp = h.x;
+        temp.toString();
+
+    }
+
+     virtual void error3()
+    presumes true achieves err  h = null;
+	
+    {
+        Mustbug h = null;
+        Objec temp = h.x;
+
+    }
+
+    
+}

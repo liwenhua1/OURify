@@ -1,6 +1,6 @@
+data A {int x; }.
 data Objec {}.
-data A {int i; }.
 data String {}.
 
-checkentail this::Objec<> & true |- this::Objec<> & true.
+checkentail this::A<v> & true |- this::A<v> & true.
 print residue.
