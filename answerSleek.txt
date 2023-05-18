@@ -3,32 +3,27 @@ ERROR : fixcalc cannot be found!!
 !!! **src/tpdispatcher.ml#492:init_tp by default: 
 !!! **src/tpdispatcher.ml#391:set_tp z3Starting z3... 
 
-!!! **WARNING****src/sleek.ml#494:[/usr/local/bin/prelude.slk,postconditon_check.slk]
-Entail 1: Fail.(must) cause:do_unmatched_rhs : sb::Stack<>@M(must)
+!!! **WARNING****src/sleek.ml#494:[/usr/local/bin/prelude.slk,post_dynamic_check.slk]
+Entail 1: Valid. 
 
 Residue:
 
- MustErr Context: 
-   fe_kind: MUST
-   fe_name: separation entailment
-   fe_locs: {
-     fc_message: do_unmatched_rhs : sb::Stack<>@M(must)
-     fc_current_lhs_flow: {FLOW,(6,7)=__Error#E}
-   }
- [[ SEARCH ==>  Match(y,y) ==>  SEARCH ==>  UnmatchedRHSData]]
- CEX:true
+ <1>emp&qName=2 & sb=sb6&{FLOW,(20,21)=__norm#E}[]
+[[ SEARCH ==>  Match(this,this) ==>  SEARCH ==>  Match(sb6,sb)]]
+
+
 
 Stop z3... 8 invocations 
 SAT Count   : 2
 SAT % Hit   : 0.%
 IMPLY Count : 6
 IMPLY % Hit : 0.%
-Time(cache overhead) : 0.000731 (seconds)
+Time(cache overhead) : 0.001515 (seconds)
 
 0 false contexts at: ()
 
-!!! log(small):(0.007934,10)
-Total verification time: 0.0482 second(s)
-	Time spent in main process: 0.037659 second(s)
-	Time spent in child processes: 0.010541 second(s)
+!!! log(small):(0.007508,11)
+Total verification time: 0.033146 second(s)
+	Time spent in main process: 0.026211 second(s)
+	Time spent in child processes: 0.006935 second(s)
 

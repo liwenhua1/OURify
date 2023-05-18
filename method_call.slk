@@ -1,3 +1,4 @@
+data CategoryDatasetHandler {Stack subHandlers; }.
 data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
 data RootHandler {Stack subHandlers; }.
 data Stack {}.
@@ -5,5 +6,5 @@ data DefaultPieDataset {int k; int v; }.
 data Objec {}.
 data String {}.
 
-checkentail ((true) & (((this = PieDatasetHandler) & (true)) & ((true) & (true)))) & (true) |- (true) & (((this = PieDatasetHandler) & (true)) & ((true) & (true))).
+checkentail (exists subhandler, current: this::Stack<> & ((true) & (((this = temp) & ((a = subhandler) & (true))) & ((true) & ((true) & (true))))) & ((((qName = 2) & (current = this)) & (subhandler = 6)) & (temp = sb6))) |- (exists subhandler, current: emp*emp*temp::Stack<> * emp & ((((qName = 2) & (current = this)) & (subhandler = 6)) & (temp = sb6)) & (((this = temp) & ((a = subhandler) & (true))) & ((true) & ((true) & (true))))).
 print residue.

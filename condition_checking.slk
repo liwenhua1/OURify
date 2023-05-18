@@ -1,3 +1,4 @@
+data CategoryDatasetHandler {Stack subHandlers; }.
 data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
 data RootHandler {Stack subHandlers; }.
 data Stack {}.
@@ -5,5 +6,5 @@ data DefaultPieDataset {int k; int v; }.
 data Objec {}.
 data String {}.
 
-checkentail emp*sb::Stack<> * this::PieDatasetHandler<sb, g> * sb::Stack<> & (qName = 2) & ((qName = 2) & (current = this)) |- false & false.
+checkentail emp*this::CategoryDatasetHandler<sb6> * sb6::Stack<> & (qName = 2) & ((qName = 2) & (current = this)) |- false & false.
 print residue.

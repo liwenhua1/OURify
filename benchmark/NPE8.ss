@@ -88,6 +88,15 @@ class RootHandler {
 
     }
 
+    virtual void startElement (String namespaceURI, String localName, int qName)
+    static presumes this::RootHandler<subHandlers:sb> & qName = 2 achieves ok this::RootHandler<subHandlers:sb> * sb::Stack<> & qName = 2;
+    dynamic presumes this::RootHandler<subHandlers:sb>  & qName = 2 achieves ok this::RootHandler<subHandlers:sb> * sb::Stack<> & qName = 2;
+
+    {
+    
+    }
+
+
 }
 
 class PieDatasetHandler extends RootHandler {
@@ -134,22 +143,26 @@ class PieDatasetHandler extends RootHandler {
         
     }
 
-      virtual void startElement(String namespaceURI, String localName, int qName)
-        presumes this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> & qName = 2 achieves err this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> & qName = 2;
+      override void startElement(String namespaceURI, String localName, int qName)
+        static presumes this::PieDatasetHandler<subHandlers:sb6,dataset:g> & qName = 2 achieves ok this::PieDatasetHandler<subHandlers:sb6,dataset:g> * sb6::Stack<> & qName = 2;
+        static presumes this::PieDatasetHandler<subHandlers:sb6,dataset:g> & qName = 2 achieves err this::PieDatasetHandler<subHandlers:sb6,dataset:g> * sb6::Stack<> & qName = 2;
+        dynamic presumes this::RootHandler<subHandlers:sb6>PieDatasetHandler<dataset:g>  & qName = 2 achieves ok this::RootHandler<subHandlers:sb6>PieDatasetHandler<dataset:g> * sb6::Stack<> & qName = 2;
+                    
                              {
 
-        DefaultHandler current = this.getCurrentHandler();
+        int current = this.getCurrentHandler();
         if (current != this) {
-            
-        }
-        else {if (qName == 1) {
+            } else {
+            if (qName == 1) {
             this.dataset = new DefaultPieDataset();
-        }
-        else {if (qName == 2) {
+        } else {
+            if (qName == 2) {
             int subhandler= 6;
             Stack temp = this.getSubHandlers();
             temp.push(subhandler);
-        }}}
+        }
+            else {}
+        }}
 
     }
 
@@ -159,6 +172,47 @@ class PieDatasetHandler extends RootHandler {
     {
         PieDatasetHandler y = new PieDatasetHandler();
         return y;
+    }
+
+}
+
+class CategoryDatasetHandler extends RootHandler {
+    
+    inherit Stack getSubHandlers() 
+    static presumes this::PieDatasetHandler<subHandlers:sb,dataset:da> achieves this::PieDatasetHandler<subHandlers:sb,dataset:da> & res = sb;
+    dynamic presumes this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> achieves this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> & res = sb;
+    {
+       
+    }
+
+    inherit DefaultHandler getCurrentHandler() 
+    static presumes this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> achieves this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> & res = this;
+    dynamic presumes this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> * sb::Stack<> achieves this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> * sb::Stack<> & res = this;
+    {
+        
+    }
+
+
+    override void startElement(String namespaceURI,String localName, int qName) 
+    static presumes this::CategoryDatasetHandler<subHandlers:sb6> & qName = 2 achieves ok this::CategoryDatasetHandler<subHandlers:sb6> * sb6::Stack<> & qName = 2;
+    static presumes this::CategoryDatasetHandler<subHandlers:sb6> & qName = 2 achieves err this::CategoryDatasetHandler<subHandlers:sb6> * sb6::Stack<> & qName = 2;
+    dynamic presumes this::RootHandler<subHandlers:sb6>CategoryDatasetHandler<>  & qName = 2 achieves ok this::RootHandler<subHandlers:sb6>CategoryDatasetHandler<> * sb6::Stack<> & qName = 2;
+            
+    {
+
+        int current = this.getCurrentHandler();
+        if (current != this) {
+            } else {
+            if (qName == 1) {
+            this.dataset = new DefaultPieDataset();
+        } else {
+            if (qName == 2) {
+            int subhandler= 6;
+            Stack temp = this.getSubHandlers();
+            temp.push(subhandler);
+        }
+            else {}
+        }}
     }
 
 }

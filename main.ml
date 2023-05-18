@@ -1108,6 +1108,7 @@ match current with
                 | _ ->
                 let pure_condition = Ipure.BForm (transfer_formula_from_program_to_pure a.exp_cond_condition) in
                 let pure_condition = Ipure.And (pure_condition, retrivepure current',a.exp_cond_pos) in
+                (* print_endline (Iprinter.string_of_pure_formula pure_condition); *)
                 let current' = (Iformula.Base {formula_base_heap=retriveheap current';formula_base_pure=pure_condition;formula_base_pos=a.exp_cond_pos}) in
                 let tt = !temp_var in 
                 let () = temp_var := [] in
