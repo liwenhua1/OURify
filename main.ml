@@ -852,6 +852,9 @@ match current with
         )
       | Var a -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc), Var ((a.exp_var_name,Unprimed),loc),loc)) in
            (Ok (update_pure current' form loc))
+           
+      | This a -> let form = Ipure.BForm (Eq (Var ((id,Unprimed),loc), Var (("this",Unprimed),loc),loc)) in
+           (Ok (update_pure current' form loc))
 
       | Instance { exp_instance_var; exp_intance_type=t ;_ }-> (match current' with 
           | Iast.F.Base {formula_base_heap; _ } -> ( match exp_instance_var with
@@ -888,8 +891,11 @@ match current with
           | Err b -> Err b 
           | Ok b -> Ok (Iformula.Base {formula_base_heap = he;formula_base_pure = pu; formula_base_pos = retrivepo b}))
         
-        | New a -> let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
-                let pu = replace_var_from_heap (retriveheap (remove_ok_err res)) "new_this" (id,Unprimed) in 
+        | New a ->   let  current'_hp = replace_var_from_heap (retriveheap current') "new_this" ("new_this_pre",Unprimed) in
+                    let current' = (Iformula.Base {formula_base_heap = current'_hp;formula_base_pure = retrivepure current'; formula_base_pos = retrivepo current'}) in
+                let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
+                let pu1 = replace_var_from_heap (retriveheap (remove_ok_err res)) "new_this" (id,Unprimed) in 
+                let pu = replace_var_from_heap pu1 "new_this_pre" ("new_this",Unprimed) in 
                 (match res with 
                 Err b -> Err b 
                | Ok b -> Ok (Iformula.Base {formula_base_heap = pu;formula_base_pure = retrivepure b; formula_base_pos = retrivepo b}))
@@ -965,6 +971,13 @@ match current with
                (Ok (Iformula.Base {formula_base_heap = res;
                formula_base_pure = retrivepure current';
                formula_base_pos= po }))
+
+               
+               (* | Null aa -> let value = Ipure.Null aa in 
+               let res = update_heap current' "this" (List.hd f) value in
+               (Ok (Iformula.Base {formula_base_heap = res;
+               formula_base_pure = retrivepure current';
+               formula_base_pos= aa })) *)
                |_ -> raise (Foo (kind_of_Exp expr ^ " " ^ "Exp not support 2")))
      
         | _ -> raise (Foo ("Only support variables"))

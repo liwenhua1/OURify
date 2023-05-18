@@ -1,6 +1,9 @@
-data A {int x; }.
+data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
+data RootHandler {Stack subHandlers; }.
+data Stack {}.
+data DefaultPieDataset {int k; int v; }.
 data Objec {}.
 data String {}.
 
-checkentail this::Objec<> & true |- this::Objec<> & true.
+checkentail this::RootHandler<sb> * sb::Stack<> & true |- this::RootHandler<sb> * sb::Stack<> & true.
 print residue.

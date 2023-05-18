@@ -3,3 +3,4 @@ casterror2 -> https://github.com/INRIA/spoon/commit/e60e3ab92d706a87e3475645f312
 npe1 -> https://github.com/traccar/traccar/commit/aa921d5acca68b92f0200183eb1c4a786a5f4882 proved
 npe2 -> https://github.com/1and1/Activiti-internal/blob/3d624a5c783c2ba8a292c6414bf6644ecd8758b0/modules/activiti-engine/src/main/java/org/activiti/engine/impl/event/AbstractEventHandler.java proved
 npe3 -> https://github.com/AxonFramework/AxonFramework/commit/b11e59f00b804128759940a7d8b49c04ed30944e proved
+npe8 -> infer report 
