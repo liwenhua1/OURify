@@ -603,7 +603,8 @@ let rec search_replace (var: ident * P.exp) formu =
     | Ipure.And (a,b,c) ->Ipure.And (check_replace_pure a fo,check_replace_pure b fo,c)
     | Ipure.BForm (Eq (a,b,c)) -> Ipure.BForm (Eq (h3 a fo,h3 b fo,c))
     | Ipure.BForm (Neq (a,b,c)) -> Ipure.BForm (Neq (h3 a fo,h3 b fo,c))
-    |_ -> raise (Foo "other pureF3") in 
+    | Ipure.BForm (Lt (a,b,c)) -> Ipure.BForm (Lt (h3 a fo,h3 b fo,c))
+    |_ -> print_endline (Iprinter.string_of_pure_formula pu); raise (Foo "other pureF3") in 
   let finished_pure = check_replace_pure (retrivepure state) formula in
   Iformula.Base {formula_base_heap =finished_heap; formula_base_pure = finished_pure; formula_base_pos = retrivepo state}
 
@@ -1151,6 +1152,7 @@ match current with
       let obj_name =(if (List.length (snd obj_list) ==0) then (find_var a.exp_call_recv_receiver) else fst (List.hd (snd obj_list))) in let meth_dec = find_meth_dec obj_name a.exp_call_recv_method in
       let uni_pre_pure = unification_pure a meth_dec in 
       let spec_selection1 = select_spec current' a.exp_call_recv_receiver a.exp_call_recv_method in
+      (* print_endline (string_of_int (List.length spec_selection1)); *)
        let rec helper sp_li = (match sp_li with 
                               | [] -> raise (Foo "cannot find a spec")
                               | spec_selection :: ss -> (*print_string (Iprinter.string_of_spec (fst spec_selection));*)let uni_pre_heap = unification_heap current' (remove_ok_err (fst spec_selection)) uni_pre_pure in

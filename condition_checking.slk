@@ -1,3 +1,5 @@
+data CustomPieURLGenerator {int index; int count; }.
+data Map {}.
 data CategoryDatasetHandler {Stack subHandlers; }.
 data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
 data RootHandler {Stack subHandlers; }.
@@ -6,5 +8,5 @@ data DefaultPieDataset {int k; int v; }.
 data Objec {}.
 data String {}.
 
-checkentail emp*this::CategoryDatasetHandler<sb6> * sb6::Stack<> & (qName = 2) & ((qName = 2) & (current = this)) |- false & false.
+checkentail emp*emp * this::CustomPieURLGenerator<z, l> * m::CustomPieURLGenerator<u, i> & (t1 != t2) & ((((l < i) & (h = 1)) & (t1 = l)) & (t2 = i)) |- false & false.
 print residue.

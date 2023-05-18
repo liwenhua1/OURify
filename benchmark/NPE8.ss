@@ -217,3 +217,68 @@ class CategoryDatasetHandler extends RootHandler {
 
 }
 
+class Map {
+
+}
+
+class CustomPieURLGenerator extends Objec{
+    int index;
+    int count;
+
+    virtual int getListCount() 
+    presumes this::CustomPieURLGenerator<index:z,count:x> achieves this::CustomPieURLGenerator<index:z,count:x> & res = x;
+
+    {   
+        int temp = this.count;
+        return temp;
+    }
+
+    virtual Objec getObj(int t)
+    static presumes this::CustomPieURLGenerator<index:z,count:x> & t > 0 achieves this::CustomPieURLGenerator<index:z,count:x> * res::Objec<>& t > 0;
+
+    static presumes this::CustomPieURLGenerator<index:z,count:x> & t <= 0 achieves this::CustomPieURLGenerator<index:z,count:x> & res=null& t <= 0 ;
+
+
+    {   
+        if (t > 0) {return new Objec();} else {return null;}
+    }
+
+    virtual Objec getURL(Objec key, int mapIndex) 
+    presumes this::CustomPieURLGenerator<index:q,count:x> * key::Objec<> & x < mapIndex achieves this::CustomPieURLGenerator<index:q,count:x> * key::Objec<> & x < mapIndex & res = null;
+
+    {
+        int result = null;
+        int temp = this.getListCount();
+        if (mapIndex < temp) {
+            int temp2 = this.index;
+            Objec urlMap = this.getObj(temp2);
+            if (urlMap != null) {
+                result = (String) urlMap.get(key);
+            }
+        }
+        return result;
+    }
+
+    virtual int equals(Objec m) 
+    static presumes this::CustomPieURLGenerator<index:z,count:l> * m::CustomPieURLGenerator<index:u,count:i> & l<i achieves err this::CustomPieURLGenerator<index:z,count:l> * k::Objec<> *m::CustomPieURLGenerator<index:u,count:i> & l<i & g=null;
+
+    {
+        
+        int h = m instanceof CustomPieURLGenerator;
+        if (h) {
+            int t1 = this.getListCount();
+            int t2 = m.getListCount();
+            if ( t1 != t2) {
+                int pieItem = t2;
+                Objec k = new Objec();
+                Objec g = this.getURL(k, pieItem);
+                g.toString();
+                return false;
+            }
+           
+        }
+        return true;
+    }
+
+
+}

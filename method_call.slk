@@ -1,3 +1,5 @@
+data CustomPieURLGenerator {int index; int count; }.
+data Map {}.
 data CategoryDatasetHandler {Stack subHandlers; }.
 data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
 data RootHandler {Stack subHandlers; }.
@@ -6,5 +8,5 @@ data DefaultPieDataset {int k; int v; }.
 data Objec {}.
 data String {}.
 
-checkentail (exists subhandler, current: this::Stack<> & ((true) & (((this = temp) & ((a = subhandler) & (true))) & ((true) & ((true) & (true))))) & ((((qName = 2) & (current = this)) & (subhandler = 6)) & (temp = sb6))) |- (exists subhandler, current: emp*emp*temp::Stack<> * emp & ((((qName = 2) & (current = this)) & (subhandler = 6)) & (temp = sb6)) & (((this = temp) & ((a = subhandler) & (true))) & ((true) & ((true) & (true))))).
+checkentail (exists pieItem, t2, t1, h: this::CustomPieURLGenerator<q, x> * key::Objec<> & ((x < mapIndex) & (((this = this) & ((key = k) & ((mapIndex = pieItem) & (true)))) & (((q = z) & ((x = l) & (true))) & ((true) & ((true) & (true)))))) & ((((((l < i) & (h = 1)) & (t1 = l)) & (t2 = i)) & (pieItem = t2)) & (true))) |- (exists pieItem, t2, t1, h: emp*emp * this::CustomPieURLGenerator<z, l> * emp * k::Objec<> & ((((((l < i) & (h = 1)) & (t1 = l)) & (t2 = i)) & (pieItem = t2)) & (true)) & (((this = this) & ((key = k) & ((mapIndex = pieItem) & (true)))) & (((q = z) & ((x = l) & (true))) & ((true) & ((true) & (true)))))).
 print residue.
