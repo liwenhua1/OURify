@@ -1,12 +1,8 @@
-data CustomPieURLGenerator {int index; int count; }.
-data Map {}.
-data CategoryDatasetHandler {Stack subHandlers; }.
-data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
-data RootHandler {Stack subHandlers; }.
-data Stack {}.
-data DefaultPieDataset {int k; int v; }.
-data Objec {}.
+data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CategoryAxis {}.
 data String {}.
 
-checkentail this::CustomPieURLGenerator<z, l> * k::Objec<> * m::CustomPieURLGenerator<u, i> & (l < i) & (g = null) |- (exists pieItem, t2, t1, h: emp*emp * emp * m::CustomPieURLGenerator<u, i> * emp * this::CustomPieURLGenerator<z, l> * k::Objec<> & ((((((l < i) & (h = 1)) & (t1 = l)) & (t2 = i)) & (pieItem = t2)) & (true)) & ((l < pieItem) & (g = null))).
+checkentail subplot::CategoryPlot<u, null> & weight > 0 |- (exists temp: emp*subplot::CategoryPlot<u, temp> & ((weight > 0) & (temp = null)) & (temp = null)).
 print residue.

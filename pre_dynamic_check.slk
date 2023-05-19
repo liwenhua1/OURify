@@ -1,10 +1,8 @@
-data CategoryDatasetHandler {Stack subHandlers; }.
-data PieDatasetHandler {Stack subHandlers; DefaultPieDataset dataset; }.
-data RootHandler {Stack subHandlers; }.
-data Stack {}.
-data DefaultPieDataset {int k; int v; }.
-data Objec {}.
+data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
+data CategoryAxis {}.
 data String {}.
 
-checkentail this::RootHandler<sb> & qName = 2 |- this::RootHandler<sb6> & qName = 2.
+checkentail this::CategoryPlot<p, i> & a = null |- this::CategoryPlot<p, i> & a = null.
 print residue.
