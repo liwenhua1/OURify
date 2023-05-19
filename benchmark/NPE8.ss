@@ -95,6 +95,19 @@ class RootHandler {
     {
     
     }
+    virtual void endElement(String namespaceURI,
+                           String localName,
+                           int qName)  
+                           
+    static presumes this::RootHandler<subHandlers:sbw> achieves this::RootHandler<subHandlers:sbw> * sbw::Stack<> ;
+    dynamic presumes this::RootHandler<subHandlers:sb> achieves this::RootHandler<subHandlers:sb> * sb::Stack<>;
+           
+                           {
+
+        
+        }
+
+    
 
 
 }
@@ -143,6 +156,23 @@ class PieDatasetHandler extends RootHandler {
         
     }
 
+     
+    override void endElement(String namespaceURI,
+                           String localName,
+                           int qName)  
+                           
+    static presumes this::PieDatasetHandler<subHandlers:sbw,dataset:g> achieves this::PieDatasetHandler<subHandlers:sbw,dataset:g> * sbw::Stack<> & current = this;
+    dynamic presumes this::RootHandler<subHandlers:sb>PieDatasetHandler<dataset:g> achieves this::RootHandler<subHandlers:sb>PieDatasetHandler<dataset:g> * sb::Stack<> & current = this;
+           
+                           {
+
+        PieDatasetHandler current = this.getCurrentHandler();
+        if (current != this) {
+            current.endElement(namespaceURI, localName, qName);
+        }
+
+    }
+
       override void startElement(String namespaceURI, String localName, int qName)
         static presumes this::PieDatasetHandler<subHandlers:sb6,dataset:g> & qName = 2 achieves ok this::PieDatasetHandler<subHandlers:sb6,dataset:g> * sb6::Stack<> & qName = 2;
         static presumes this::PieDatasetHandler<subHandlers:sb6,dataset:g> & qName = 2 achieves err this::PieDatasetHandler<subHandlers:sb6,dataset:g> * sb6::Stack<> & qName = 2;
@@ -179,18 +209,35 @@ class PieDatasetHandler extends RootHandler {
 class CategoryDatasetHandler extends RootHandler {
     
     inherit Stack getSubHandlers() 
-    static presumes this::PieDatasetHandler<subHandlers:sb,dataset:da> achieves this::PieDatasetHandler<subHandlers:sb,dataset:da> & res = sb;
+    static presumes this::CategoryDatasetHandler<subHandlers:sb> achieves this::CategoryDatasetHandler<subHandlers:sb> & res = sb;
     dynamic presumes this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> achieves this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> & res = sb;
     {
        
     }
 
     inherit DefaultHandler getCurrentHandler() 
-    static presumes this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> achieves this::PieDatasetHandler<subHandlers:sb,dataset:g> * sb::Stack<> & res = this;
+    static presumes this::CategoryDatasetHandler<subHandlers:sb> * sb::Stack<> achieves this::CategoryDatasetHandler<subHandlers:sb> * sb::Stack<> & res = this;
     dynamic presumes this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> * sb::Stack<> achieves this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> * sb::Stack<> & res = this;
     {
         
     }
+
+     override void endElement(String namespaceURI,
+                           String localName,
+                           int qName)  
+                           
+    static presumes this::CategoryDatasetHandler<subHandlers:sbw> achieves this::CategoryDatasetHandler<subHandlers:sbw> * sbw::Stack<> & current = this;
+    dynamic presumes this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> achieves this::RootHandler<subHandlers:sb>CategoryDatasetHandler<> * sb::Stack<> & current = this;
+           
+                           {
+
+        PieDatasetHandler current = this.getCurrentHandler();
+        if (current != this) {
+            current.endElement(namespaceURI, localName, qName);
+        }
+
+    }
+    
 
 
     override void startElement(String namespaceURI,String localName, int qName) 
