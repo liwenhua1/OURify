@@ -274,7 +274,7 @@ let rec retriveContentfromPure (spec:formula) name =
 
    ;;
 
- let rec rfN_helper (spec:Iast.F.h_formula) name =
+ let rec rfN_helper (spec:Iast.F.h_formula) name =  (*find content for given node*)
     match spec with 
      | Heapdynamic {h_formula_heap_node; h_formula_heap_content; _ } -> 
         if (String.compare (fst h_formula_heap_node) name == 0) then (true, h_formula_heap_content)
@@ -526,7 +526,7 @@ let return_heap_uni (var_eq:P.b_formula) p1 p2 =
 
 
 let rec unification_heap pre pre_dec var_uni=
-      (* print_string ((string_of_pure_formula var_uni)^"\n"); *)
+      
       match var_uni with
       | Ipure.BForm a -> return_heap_uni a pre pre_dec
       | Ipure.And (a,b,c) -> Ipure.And (unification_heap pre pre_dec a, unification_heap pre pre_dec b,c)
@@ -698,11 +698,11 @@ let retrieve_spec obj_name meth_name spec_inter =
   let inter_head =  fst (List.hd spec_inter) in
   let (spec1, spec2) = find_spec obj_name meth_name !verified_method in 
   let pre = retriveContentfromNode (remove_ok_err (fst (List.hd (spec1)))) "this" in 
-  if (String.compare inter_head (fst (List.hd (snd pre))) == 0) then spec1 else 
+  if (String.compare inter_head (fst (List.hd (snd pre))) == 0) then spec1 else (*if inter_head equal spec_head then static *)
 
     let rec helper sp= match sp with 
      | [] -> []
-     | x::xs -> let pre_d = retriveContentfromNode (remove_ok_err (fst x)) "this" in
+     | x::xs -> let pre_d = retriveContentfromNode (remove_ok_err (fst x)) "this" in (*spec_head is subtype of iner_head then choose*)
                 if Iast.sub_type (Named (fst (List.hd (snd pre_d)))) (Named inter_head) then x :: helper xs else
                 let new_node_p = type_restriction (snd pre_d) inter_head in 
                 let new_pre = update_node_content (fst x) "this" new_node_p in
@@ -751,6 +751,55 @@ let rec transfer_formula_from_program_to_pure (program_formula:Iast.exp) : P.b_f
   |Iast.Binary {exp_binary_op = OpLt; exp_binary_oper1 = a;exp_binary_oper2 = b;exp_binary_pos = c} -> Ipure.Lt (helper a,helper b,c)
   | _ -> raise (Foo ("binary operation transfer Not supported yet"))
 
+  let ch_hp = ref false 
+  let rec change_helper (spec:Iast.F.h_formula) name list1= 
+   (*find content for given node*)
+    match spec with 
+     | Heapdynamic a -> 
+        if (String.compare (fst a.h_formula_heap_node) name == 0) then let () = ch_hp := true in 
+         Iformula.Heapdynamic {h_formula_heap_node =a.h_formula_heap_node; 
+        h_formula_heap_content = list1; h_formula_heap_pos=a.h_formula_heap_pos }
+        else Heapdynamic a
+     | Star a -> 
+        Star {h_formula_star_h1 = change_helper a.h_formula_star_h1 name list1; h_formula_star_h2 = change_helper a.h_formula_star_h2 name list1;h_formula_star_pos = a.h_formula_star_pos} 
+     | HTrue -> HTrue
+     | _ -> raise (Foo "Other F") 
+  let rec change_node_content (spec1:Iast.F.formula) name1 contents= 
+    let alising = retrivepure spec1 in
+    let heap = retriveheap spec1 in
+     let res = change_helper heap name1 contents in
+     if !ch_hp==true then 
+      let () = ch_hp := false in
+      res else 
+      let (res1,res2) = retriveContentfromPure alising name1 in 
+       match res2 with
+                                                            | Var a -> change_node_content (spec1:Iast.F.formula) (fst (fst a)) contents
+                                                          
+                                                            | _ -> raise (Foo "Must be var")
+
+
+    ;;
+
+  let find_length n1 n2 = 
+    let last =fst (List.hd (List.rev n2)) in
+    let rec helper w1 name = 
+      match w1 with
+      | x::xs -> if (String.compare (fst x) name) == 0 then 0 else 1 + (helper xs name)
+      | [] ->  raise (Foo "should inside list") in 
+    let l = helper (List.rev n1) last in 
+    (List.length n1) - l
+
+  let slice hp length varname = 
+  let (a,b) = retriveContentfromNode hp varname in
+  if a == false then raise (Foo ("receiver not in heap")) else 
+    let rec helper node number= 
+      match number with
+      | 0 -> []
+      | n -> (List.hd node) :: helper (List.tl node) (n-1) in 
+    let res = helper b length in 
+    change_node_content hp varname res
+      
+    
 let rec oop_verification_method_aux obj decl expr (current:specs) : specs = 
 match current with 
 | Err a -> Err a
@@ -1152,15 +1201,29 @@ match current with
       let obj_name =(if (List.length (snd obj_list) ==0) then (find_var a.exp_call_recv_receiver) else fst (List.hd (snd obj_list))) in let meth_dec = find_meth_dec obj_name a.exp_call_recv_method in
       let uni_pre_pure = unification_pure a meth_dec in 
       let spec_selection1 = select_spec current' a.exp_call_recv_receiver a.exp_call_recv_method in
-      (* print_endline (string_of_int (List.length spec_selection1)); *)
        let rec helper sp_li = (match sp_li with 
                               | [] -> raise (Foo "cannot find a spec")
-                              | spec_selection :: ss -> (*print_string (Iprinter.string_of_spec (fst spec_selection));*)let uni_pre_heap = unification_heap current' (remove_ok_err (fst spec_selection)) uni_pre_pure in
+                              | spec_selection :: ss -> (*print_string (Iprinter.string_of_spec (fst spec_selection));*)
+      let node1 = retriveContentfromNode current' (find_var a.exp_call_recv_receiver) in 
+      let node2 = retriveContentfromNode (remove_ok_err (fst spec_selection)) "this" in 
+      let inter_length = find_length (snd node1) (snd node2) in 
+      (* print_endline (string_of_int inter_length); *)
+      (* let inter_length2 = List.length (snd (retriveContentfromNode (current') (find_var a.exp_call_recv_receiver))) in
+      
+      print_endline (string_of_int inter_length2); *)
+      let changing_heap = Iformula.Base {formula_base_heap = snd res;formula_base_pure = retrivepure current';formula_base_pos = a.exp_call_recv_pos} in
+      let current_heap_slice = slice changing_heap inter_length (find_var a.exp_call_recv_receiver) in
+      (* let inter_length2 = List.length (snd (rfN_helper current_heap_slice (find_var a.exp_call_recv_receiver))) in *)
+      (* print_endline (string_of_int inter_length2);  *)
+      let thing_to_uni = Iformula.Base {formula_base_heap = current_heap_slice;formula_base_pure = retrivepure current';formula_base_pos = a.exp_call_recv_pos} in
+      let uni_pre_heap = unification_heap thing_to_uni (remove_ok_err (fst spec_selection)) uni_pre_pure in
       let uni = Ipure.And (uni_pre_pure ,uni_pre_heap,a.exp_call_recv_pos) in
       let form = Ipure.And (retrivepure current' ,uni,a.exp_call_recv_pos) in
       let pre_pure = Ipure.And ( (Ipure.And (retrivepure (remove_ok_err (fst spec_selection)) ,uni,a.exp_call_recv_pos)), retrivepure current', a.exp_call_recv_pos) in
       let pre_condition = Ok (Iformula.Base {formula_base_heap = retriveheap (remove_ok_err (fst spec_selection));formula_base_pure = pre_pure;formula_base_pos = a.exp_call_recv_pos}) in
-      let current_state = Iformula.Base {formula_base_heap = snd res;formula_base_pure = form;formula_base_pos = a.exp_call_recv_pos} in
+      let current_state = Iformula.Base {formula_base_heap = current_heap_slice;formula_base_pure = form;formula_base_pos = a.exp_call_recv_pos} in
+      (* print_endline (string_of_formula current_state);
+      print_endline (string_of_spec pre_condition); *)
       (* let t = !temp_var; in temp_var := []; *)
       entail_checking_method_call "method_call.slk" (singlised_heap pre_condition) (Ok (Iformula.mkFalse a.exp_call_recv_pos)); 
       let content_slk = Asksleek.asksleek "method_call.slk" in
@@ -1170,6 +1233,7 @@ match current with
       let content_slk = Asksleek.asksleek "method_call.slk" in
       let res1 = Asksleek.entail_res content_slk in
       (* temp_var := t; *)
+      (* (print_endline (string_of_bool res1)); *)
       (if res1 == true then let post_condition = refine (remove_ok_err (snd spec_selection)) uni in
       let post_state = Iformula.Base {formula_base_heap = Iformula.Star {h_formula_star_h1 = fst res;h_formula_star_h2 =retriveheap post_condition;h_formula_star_pos = retrivepo current'}; 
                                     formula_base_pure = Ipure.And (retrivepure current',retrivepure post_condition,retrivepo current');formula_base_pos = retrivepo current'} in

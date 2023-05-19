@@ -1,3 +1,4 @@
+data CombinedCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.

@@ -1,8 +1,10 @@
+data Test {}.
+data CombinedCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
 data CategoryAxis {}.
 data String {}.
 
-checkentail (exists temp: this::CategoryPlot<p, i> & ((a = null) & (((this = subplot) & ((a = temp) & (true))) & (((p = e) & ((i = u) & (true))) & ((true) & (true))))) & ((weight > 0) & (temp = null))) |- (exists temp: subplot::CategoryPlot<e, u> & ((weight > 0) & (temp = null)) & (((this = subplot) & ((a = temp) & (true))) & (((p = e) & ((i = u) & (true))) & ((true) & (true))))).
+checkentail this::Test<> * t1::CombinedDomainCategoryPlot<p, i> & ((true) & (((this = this) & ((t1 = t1) & (true))) & ((true) & (((p = p) & ((i = i) & (true))) & (true))))) & (true) |- this::Test<> * t1::CombinedDomainCategoryPlot<p, i> & (true) & (((this = this) & ((t1 = t1) & (true))) & ((true) & (((p = p) & ((i = i) & (true))) & (true)))).
 print residue.
