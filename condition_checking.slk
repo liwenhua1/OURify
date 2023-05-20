@@ -1,9 +1,13 @@
-data CombinedCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryAxis {}.
+data E {Objec nl; }.
+data L {L next; }.
+data Bl {int test1; int test2; }.
+data Nullable {Objec mFld; }.
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
+data A {int x; }.
+data Objec {}.
 data String {}.
 
-checkentail subplot::CategoryPlot<e, u> & (weight > 0) & (weight > 0) |- false & false.
+checkentail emp*emp * emp*emp * this::E<l> * a::A<(0+1)+1> & (temp != 2) & ((((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1)) |- false & false.
 print residue.

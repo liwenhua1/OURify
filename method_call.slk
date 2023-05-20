@@ -1,10 +1,13 @@
-data Test {}.
-data CombinedCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryAxis {}.
+data E {Objec nl; }.
+data L {L next; }.
+data Bl {int test1; int test2; }.
+data Nullable {Objec mFld; }.
+data D {int x; }.
+data C {B b; }.
+data B {A a; }.
+data A {int x; }.
+data Objec {}.
 data String {}.
 
-checkentail this::Test<> * t1::CombinedDomainCategoryPlot<p, i> & ((true) & (((this = this) & ((t1 = t1) & (true))) & ((true) & (((p = p) & ((i = i) & (true))) & (true))))) & (true) |- this::Test<> * t1::CombinedDomainCategoryPlot<p, i> & (true) & (((this = this) & ((t1 = t1) & (true))) & ((true) & (((p = p) & ((i = i) & (true))) & (true)))).
+checkentail this::E<l> * z::A<v> & ((true) & (((this = this) & ((z = a) & (true))) & (((l = l) & (true)) & (((v = 0+1) & (true)) & (true))))) & (((true) & (true)) & (true)) |- emp*emp * this::E<l> * a::A<0+1> & (((true) & (true)) & (true)) & (((this = this) & ((z = a) & (true))) & (((l = l) & (true)) & (((v = 0+1) & (true)) & (true)))).
 print residue.

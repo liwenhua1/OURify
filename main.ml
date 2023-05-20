@@ -942,6 +942,7 @@ match current with
           | Ok b -> Ok (Iformula.Base {formula_base_heap = he;formula_base_pure = pu; formula_base_pos = retrivepo b}))
         
         | New a ->   let  current'_hp = replace_var_from_heap (retriveheap current') "new_this" ("new_this_pre",Unprimed) in
+                    (* print_endline (a.exp_new_class_name); *)
                     let current' = (Iformula.Base {formula_base_heap = current'_hp;formula_base_pure = retrivepure current'; formula_base_pos = retrivepo current'}) in
                 let res = oop_verification_method_aux obj decl (CallRecv {exp_call_recv_receiver = Var {exp_var_name = a.exp_new_class_name;exp_var_pos = a.exp_new_pos};exp_call_recv_arguments = a.exp_new_arguments;exp_call_recv_pos=a.exp_new_pos;exp_call_recv_method=a.exp_new_class_name}) (Ok current') in
                 let pu1 = replace_var_from_heap (retriveheap (remove_ok_err res)) "new_this" (id,Unprimed) in 
@@ -1201,18 +1202,24 @@ match current with
       let obj_name =(if (List.length (snd obj_list) ==0) then (find_var a.exp_call_recv_receiver) else fst (List.hd (snd obj_list))) in let meth_dec = find_meth_dec obj_name a.exp_call_recv_method in
       let uni_pre_pure = unification_pure a meth_dec in 
       let spec_selection1 = select_spec current' a.exp_call_recv_receiver a.exp_call_recv_method in
+      (* print_int (List.length spec_selection1);
+      print_endline (string_of_spec (fst (List.hd spec_selection1))); *)
        let rec helper sp_li = (match sp_li with 
                               | [] -> raise (Foo "cannot find a spec")
                               | spec_selection :: ss -> (*print_string (Iprinter.string_of_spec (fst spec_selection));*)
       let node1 = retriveContentfromNode current' (find_var a.exp_call_recv_receiver) in 
+      (* print_endline (string_of_bool (fst node1)); *)
       let node2 = retriveContentfromNode (remove_ok_err (fst spec_selection)) "this" in 
+      
+      let current_heap_slice = if (fst node1 && fst node2) then 
+
       let inter_length = find_length (snd node1) (snd node2) in 
       (* print_endline (string_of_int inter_length); *)
       (* let inter_length2 = List.length (snd (retriveContentfromNode (current') (find_var a.exp_call_recv_receiver))) in
       
       print_endline (string_of_int inter_length2); *)
       let changing_heap = Iformula.Base {formula_base_heap = snd res;formula_base_pure = retrivepure current';formula_base_pos = a.exp_call_recv_pos} in
-      let current_heap_slice = slice changing_heap inter_length (find_var a.exp_call_recv_receiver) in
+      slice changing_heap inter_length (find_var a.exp_call_recv_receiver) else snd res in
       (* let inter_length2 = List.length (snd (rfN_helper current_heap_slice (find_var a.exp_call_recv_receiver))) in *)
       (* print_endline (string_of_int inter_length2);  *)
       let thing_to_uni = Iformula.Base {formula_base_heap = current_heap_slice;formula_base_pure = retrivepure current';formula_base_pos = a.exp_call_recv_pos} in

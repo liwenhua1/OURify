@@ -1,9 +1,6 @@
-data CombinedCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedDomainCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CombinedRangeCategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryPlot {CategoryAxis pre; CategoryAxis ax; }.
-data CategoryAxis {}.
+data A {int x; }.
+data Objec {}.
 data String {}.
 
-checkentail this::CategoryPlot<i, a> & a = null |- this::CategoryPlot<i, a> & a = null.
+checkentail this::Objec<> & true |- this::Objec<> & true.
 print residue.
