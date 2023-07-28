@@ -1,13 +1,6 @@
-data E {Objec nl; }.
-data L {L next; }.
-data Bl {int test1; int test2; }.
-data Nullable {Objec mFld; }.
-data D {int x; }.
-data C {B b; }.
-data B {A a; }.
-data A {int x; }.
-data Objec {}.
+data ErrorCode {}.
+data ErrorMessage {int location; }.
 data String {}.
 
-checkentail this::E<l> * a::A<0> & a = b |- (exists temp: emp*emp * emp*emp * this::E<l> * a::A<0> & (((((true) & (true)) & (true)) & (true)) & (b = a)) & (temp = (0+1)+1)).
+checkentail this::ErrorCode<> * z::ErrorMessage<v1> & true |- (exists q: emp*emp * this::ErrorCode<> * z::ErrorMessage<v1> & ((true) & (q = null)) & (q = null)).
 print residue.
